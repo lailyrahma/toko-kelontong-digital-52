@@ -2,15 +2,15 @@
 import React, { useState } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Search, Scan, ShoppingCart, Trash2, Plus, Minus, CreditCard, Smartphone, Banknote, Printer, Package } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Scan, ShoppingCart, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import ProductCard from '@/components/transaction/ProductCard';
+import CartItem from '@/components/transaction/CartItem';
+import ProductFilters from '@/components/transaction/ProductFilters';
+import PaymentDialog from '@/components/transaction/PaymentDialog';
+import ReceiptDialog from '@/components/transaction/ReceiptDialog';
 
 interface Product {
   id: string;
@@ -22,12 +22,12 @@ interface Product {
   image?: string;
 }
 
-interface CartItem extends Product {
+interface CartItemData extends Product {
   quantity: number;
 }
 
 const Transaction = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItemData[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'qris' | 'debit'>('cash');
@@ -147,13 +147,6 @@ const Transaction = () => {
     });
   };
 
-  const getStockBadge = (stock: number) => {
-    if (stock === 0) return <Badge variant="destructive" className="stock-empty">Habis</Badge>;
-    if (stock < 10) return <Badge variant="secondary" className="stock-low">Sedikit</Badge>;
-    if (stock <= 50) return <Badge variant="secondary" className="stock-normal">Normal</Badge>;
-    return <Badge variant="secondary" className="stock-abundant">Banyak</Badge>;
-  };
-
   return (
     <>
       <AppSidebar />
@@ -174,59 +167,21 @@ const Transaction = () => {
         <div className="flex-1 flex">
           {/* Product Selection */}
           <div className="flex-1 p-6">
-            <div className="mb-6 flex space-x-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Cari produk atau scan barcode..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Pilih kategori" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map(category => (
-                    <SelectItem key={category} value={category}>
-                      {category === 'all' ? 'Semua Kategori' : category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <ProductFilters
+              searchTerm={searchTerm}
+              selectedCategory={selectedCategory}
+              categories={categories}
+              onSearchChange={setSearchTerm}
+              onCategoryChange={setSelectedCategory}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredProducts.map((product) => (
-                <Card key={product.id} className="cursor-pointer hover:shadow-lg transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                      <Package className="h-12 w-12 text-muted-foreground" />
-                    </div>
-                    <h3 className="font-medium mb-1 line-clamp-2">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">{product.category}</p>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-lg">
-                        Rp {product.price.toLocaleString('id-ID')}
-                      </span>
-                      {getStockBadge(product.stock)}
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      Stok: {product.stock} | Barcode: {product.barcode}
-                    </p>
-                    <Button 
-                      onClick={() => addToCart(product)}
-                      disabled={product.stock === 0}
-                      className="w-full"
-                      size="sm"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Tambah
-                    </Button>
-                  </CardContent>
-                </Card>
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={addToCart}
+                />
               ))}
             </div>
           </div>
@@ -252,46 +207,12 @@ const Transaction = () => {
                 </p>
               ) : (
                 cartItems.map((item) => (
-                  <Card key={item.id}>
-                    <CardContent className="p-4">
-                      <h4 className="font-medium mb-2">{item.name}</h4>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-lg font-bold">
-                          Rp {item.price.toLocaleString('id-ID')}
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="w-8 text-center">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            disabled={item.quantity >= item.stock}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">
-                          Subtotal: Rp {(item.price * item.quantity).toLocaleString('id-ID')}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeFromCart(item.id)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    onUpdateQuantity={updateQuantity}
+                    onRemove={removeFromCart}
+                  />
                 ))
               )}
             </div>
@@ -316,134 +237,26 @@ const Transaction = () => {
           </div>
         </div>
 
-        {/* Payment Dialog */}
-        <Dialog open={showPayment} onOpenChange={setShowPayment}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Pembayaran</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold">
-                  Total: Rp {totalAmount.toLocaleString('id-ID')}
-                </p>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-2 block">Metode Pembayaran</label>
-                <div className="grid grid-cols-3 gap-2">
-                  <Button
-                    variant={paymentMethod === 'cash' ? 'default' : 'outline'}
-                    onClick={() => setPaymentMethod('cash')}
-                    className="flex flex-col h-16"
-                  >
-                    <Banknote className="h-5 w-5 mb-1" />
-                    Tunai
-                  </Button>
-                  <Button
-                    variant={paymentMethod === 'qris' ? 'default' : 'outline'}
-                    onClick={() => setPaymentMethod('qris')}
-                    className="flex flex-col h-16"
-                  >
-                    <Smartphone className="h-5 w-5 mb-1" />
-                    QRIS
-                  </Button>
-                  <Button
-                    variant={paymentMethod === 'debit' ? 'default' : 'outline'}
-                    onClick={() => setPaymentMethod('debit')}
-                    className="flex flex-col h-16"
-                  >
-                    <CreditCard className="h-5 w-5 mb-1" />
-                    Debit
-                  </Button>
-                </div>
-              </div>
+        <PaymentDialog
+          isOpen={showPayment}
+          onClose={() => setShowPayment(false)}
+          totalAmount={totalAmount}
+          paymentMethod={paymentMethod}
+          amountPaid={amountPaid}
+          onPaymentMethodChange={setPaymentMethod}
+          onAmountPaidChange={setAmountPaid}
+          onProcessPayment={processPayment}
+        />
 
-              {paymentMethod === 'cash' && (
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Jumlah Dibayar</label>
-                  <Input
-                    type="number"
-                    placeholder="Masukkan jumlah"
-                    value={amountPaid}
-                    onChange={(e) => setAmountPaid(e.target.value)}
-                  />
-                  {amountPaid && parseFloat(amountPaid) >= totalAmount && (
-                    <p className="text-sm text-green-600 mt-2">
-                      Kembalian: Rp {(parseFloat(amountPaid) - totalAmount).toLocaleString('id-ID')}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              <Button onClick={processPayment} className="w-full">
-                Proses Pembayaran
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Receipt Dialog */}
-        <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Struk Pembayaran</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="text-center border-b pb-4">
-                <h3 className="font-bold">Toko Kelontong Barokah</h3>
-                <p className="text-sm text-muted-foreground">
-                  Jl. Mawar No. 123, Jakarta
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Telp: 021-12345678
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span>{item.name} x{item.quantity}</span>
-                    <span>Rp {(item.price * item.quantity).toLocaleString('id-ID')}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="border-t pt-2 space-y-1">
-                <div className="flex justify-between font-bold">
-                  <span>Total:</span>
-                  <span>Rp {totalAmount.toLocaleString('id-ID')}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Metode:</span>
-                  <span className="capitalize">{paymentMethod}</span>
-                </div>
-                {paymentMethod === 'cash' && amountPaid && (
-                  <>
-                    <div className="flex justify-between text-sm">
-                      <span>Dibayar:</span>
-                      <span>Rp {parseFloat(amountPaid).toLocaleString('id-ID')}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Kembalian:</span>
-                      <span>Rp {(parseFloat(amountPaid) - totalAmount).toLocaleString('id-ID')}</span>
-                    </div>
-                  </>
-                )}
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button variant="outline" className="flex-1">
-                  <Printer className="mr-2 h-4 w-4" />
-                  Cetak
-                </Button>
-                <Button onClick={finishTransaction} className="flex-1">
-                  Selesai
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <ReceiptDialog
+          isOpen={showReceipt}
+          onClose={() => setShowReceipt(false)}
+          cartItems={cartItems}
+          totalAmount={totalAmount}
+          paymentMethod={paymentMethod}
+          amountPaid={amountPaid}
+          onFinishTransaction={finishTransaction}
+        />
       </div>
     </>
   );
