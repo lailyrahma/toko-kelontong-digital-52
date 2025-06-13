@@ -20,7 +20,7 @@ const ProductFilters = ({
   onCategoryChange 
 }: ProductFiltersProps) => {
   return (
-    <div className="mb-6 flex space-x-4">
+    <div className="mb-4 md:mb-6 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
       <div className="flex-1 relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input
@@ -31,7 +31,7 @@ const ProductFilters = ({
         />
       </div>
       <Select value={selectedCategory} onValueChange={onCategoryChange}>
-        <SelectTrigger className="w-48">
+        <SelectTrigger className="w-full sm:w-48">
           <SelectValue placeholder="Pilih kategori" />
         </SelectTrigger>
         <SelectContent>
