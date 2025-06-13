@@ -69,37 +69,37 @@ const Dashboard = () => {
     <>
       <AppSidebar />
       <div className="flex-1 flex flex-col">
-        <header className="flex items-center justify-between p-6 border-b bg-white">
-          <div className="flex items-center space-x-4">
+        <header className="flex items-center justify-between p-4 md:p-6 border-b bg-white">
+          <div className="flex items-center space-x-2 md:space-x-4 flex-1 min-w-0">
             <SidebarTrigger />
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">
                 Selamat datang, {user?.name}!
               </h1>
-              <p className="text-muted-foreground">{currentDate}</p>
+              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">{currentDate}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
             <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+              <Bell className="h-4 w-4 md:h-5 md:w-5" />
+              <Badge className="absolute -top-1 -right-1 h-4 w-4 md:h-5 md:w-5 flex items-center justify-center p-0 text-xs">
                 3
               </Badge>
             </Button>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold">
+            <div className="hidden sm:flex items-center space-x-2">
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center">
+                <span className="text-white text-xs md:text-sm font-bold">
                   {user?.name.charAt(0)}
                 </span>
               </div>
-              <span className="text-sm font-medium">{user?.name}</span>
+              <span className="text-xs md:text-sm font-medium hidden md:block">{user?.name}</span>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 p-6 bg-gray-50">
+        <main className="flex-1 p-4 md:p-6 bg-gray-50">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-6">
             {stats.map((stat, index) => (
               <Card 
                 key={index} 
@@ -108,21 +108,21 @@ const Dashboard = () => {
                 }`}
                 onClick={stat.onClick}
               >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-4">
+                  <CardTitle className="text-xs md:text-sm font-medium leading-tight">
                     {stat.title}
                   </CardTitle>
-                  <stat.icon className="h-4 w-4 text-muted-foreground" />
+                  <stat.icon className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground">
+                <CardContent className="p-3 md:p-4 pt-0">
+                  <div className="text-lg md:text-2xl font-bold truncate">{stat.value}</div>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-muted-foreground truncate flex-1">
                       {stat.description}
                     </p>
                     <Badge 
                       variant={stat.trend === 'warning' ? 'destructive' : 'secondary'}
-                      className={stat.trend === 'warning' ? '' : 'text-green-600'}
+                      className={`text-xs flex-shrink-0 ml-1 ${stat.trend === 'warning' ? '' : 'text-green-600'}`}
                     >
                       {stat.trend}
                     </Badge>
@@ -132,25 +132,25 @@ const Dashboard = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             {/* Recent Transactions */}
             <Card>
-              <CardHeader>
-                <CardTitle>Transaksi Terbaru</CardTitle>
-                <CardDescription>Transaksi hari ini</CardDescription>
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="text-lg md:text-xl">Transaksi Terbaru</CardTitle>
+                <CardDescription className="text-sm">Transaksi hari ini</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="p-4 md:p-6 pt-0">
+                <div className="space-y-3 md:space-y-4">
                   {recentTransactions.map((transaction) => (
                     <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">{transaction.id}</p>
-                        <p className="text-sm text-muted-foreground">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm md:text-base">{transaction.id}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">
                           {transaction.time} • {transaction.items} item
                         </p>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium">{transaction.total}</p>
+                      <div className="text-right flex-shrink-0 ml-2">
+                        <p className="font-medium text-sm md:text-base">{transaction.total}</p>
                         <Badge variant="outline" className="text-xs">
                           {transaction.method}
                         </Badge>
@@ -160,7 +160,7 @@ const Dashboard = () => {
                 </div>
                 <Button 
                   variant="outline" 
-                  className="w-full mt-4"
+                  className="w-full mt-4 text-sm"
                   onClick={() => navigate('/transaction')}
                 >
                   Mulai Transaksi Baru
@@ -170,30 +170,30 @@ const Dashboard = () => {
 
             {/* Low Stock Alert */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="flex items-center space-x-2 text-lg md:text-xl">
+                  <AlertTriangle className="h-4 w-4 md:h-5 md:w-5 text-yellow-500 flex-shrink-0" />
                   <span>Peringatan Stok</span>
                 </CardTitle>
-                <CardDescription>Produk yang perlu direstock</CardDescription>
+                <CardDescription className="text-sm">Produk yang perlu direstock</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="p-4 md:p-6 pt-0">
+                <div className="space-y-3 md:space-y-4">
                   {lowStockItems.map((item, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-muted-foreground">{item.category}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm md:text-base truncate">{item.name}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">{item.category}</p>
                       </div>
-                      <div className="text-right">
-                        <p className={`font-medium ${
+                      <div className="text-right flex-shrink-0 ml-2">
+                        <p className={`font-medium text-sm md:text-base ${
                           item.status === 'empty' ? 'text-red-600' : 'text-yellow-600'
                         }`}>
                           {item.stock === 0 ? 'Habis' : `${item.stock} tersisa`}
                         </p>
                         <Badge 
                           variant={item.status === 'empty' ? 'destructive' : 'secondary'}
-                          className={item.status === 'empty' ? '' : 'bg-yellow-100 text-yellow-800'}
+                          className={`text-xs ${item.status === 'empty' ? '' : 'bg-yellow-100 text-yellow-800'}`}
                         >
                           {item.status === 'empty' ? 'Habis' : 'Sedikit'}
                         </Badge>
@@ -203,7 +203,7 @@ const Dashboard = () => {
                 </div>
                 <Button 
                   variant="outline" 
-                  className="w-full mt-4"
+                  className="w-full mt-4 text-sm"
                   onClick={() => navigate('/stock')}
                 >
                   Kelola Stok
