@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -147,14 +146,14 @@ const Analytics = () => {
     <>
       <AppSidebar />
       <div className="flex-1 flex flex-col">
-        <header className="flex items-center justify-between p-6 border-b bg-white">
-          <div className="flex items-center space-x-4">
+        <header className="flex items-center justify-between p-4 md:p-6 border-b bg-white">
+          <div className="flex items-center space-x-2 md:space-x-4">
             <SidebarTrigger />
-            <h1 className="text-2xl font-bold">Analytics & Insights</h1>
+            <h1 className="text-xl md:text-2xl font-bold">Analytics & Insights</h1>
           </div>
         </header>
 
-        <main className="flex-1 p-6 bg-gray-50 space-y-6">
+        <main className="flex-1 p-3 md:p-6 bg-gray-50 space-y-4 md:space-y-6">
           {/* Date Range Filter */}
           <DateRangeFilter
             dateRange={dateRange}
@@ -163,23 +162,23 @@ const Analytics = () => {
             onDateChange={setSelectedDate}
           />
 
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Stats Overview - Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {stats.map((stat, index) => (
-              <Card key={index}>
+              <Card key={index} className="min-w-0">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                  <CardTitle className="text-sm font-medium truncate">
                     {stat.title}
                   </CardTitle>
-                  <stat.icon className="h-4 w-4 text-muted-foreground" />
+                  <stat.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <div className="text-xl md:text-2xl font-bold truncate">{stat.value}</div>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground truncate">
                       {stat.description}
                     </p>
-                    <span className="text-xs text-green-600 font-medium">
+                    <span className="text-xs text-green-600 font-medium flex-shrink-0">
                       {stat.change}
                     </span>
                   </div>
@@ -188,74 +187,102 @@ const Analytics = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Charts Section - Responsive Layout */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
             {/* Sales Chart */}
-            <Card className="lg:col-span-2">
+            <Card className="xl:col-span-2">
               <CardHeader>
-                <CardTitle>Trend Penjualan - {getPeriodTitle(dateRange)}</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-lg md:text-xl">Trend Penjualan - {getPeriodTitle(dateRange)}</CardTitle>
+                <CardDescription className="text-sm">
                   Penjualan untuk periode {getPeriodTitle(dateRange).toLowerCase()}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={salesData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, 'Penjualan']} />
-                    <Bar dataKey="sales" fill="#3b82f6" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="h-64 md:h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={salesData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="name" 
+                        fontSize={12}
+                        tick={{ fontSize: 10 }}
+                      />
+                      <YAxis 
+                        fontSize={12}
+                        tick={{ fontSize: 10 }}
+                      />
+                      <Tooltip 
+                        formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, 'Penjualan']}
+                        labelStyle={{ fontSize: '12px' }}
+                        contentStyle={{ fontSize: '12px' }}
+                      />
+                      <Bar dataKey="sales" fill="#3b82f6" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
 
             {/* Category Distribution */}
             <Card>
               <CardHeader>
-                <CardTitle>Distribusi Kategori</CardTitle>
-                <CardDescription>Penjualan berdasarkan kategori produk</CardDescription>
+                <CardTitle className="text-lg md:text-xl">Distribusi Kategori</CardTitle>
+                <CardDescription className="text-sm">Penjualan berdasarkan kategori produk</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="h-64 md:h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={categoryData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {categoryData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
 
             {/* Stock Movement */}
             <Card>
               <CardHeader>
-                <CardTitle>Pergerakan Stok</CardTitle>
-                <CardDescription>Stok masuk vs stok keluar per minggu</CardDescription>
+                <CardTitle className="text-lg md:text-xl">Pergerakan Stok</CardTitle>
+                <CardDescription className="text-sm">Stok masuk vs stok keluar per minggu</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={stockMovement}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="stockIn" stroke="#00C49F" name="Stok Masuk" />
-                    <Line type="monotone" dataKey="stockOut" stroke="#FF8042" name="Stok Keluar" />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="h-64 md:h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={stockMovement}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="name" 
+                        fontSize={12}
+                        tick={{ fontSize: 10 }}
+                      />
+                      <YAxis 
+                        fontSize={12}
+                        tick={{ fontSize: 10 }}
+                      />
+                      <Tooltip 
+                        labelStyle={{ fontSize: '12px' }}
+                        contentStyle={{ fontSize: '12px' }}
+                      />
+                      <Line type="monotone" dataKey="stockIn" stroke="#00C49F" name="Stok Masuk" strokeWidth={2} />
+                      <Line type="monotone" dataKey="stockOut" stroke="#FF8042" name="Stok Keluar" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -266,69 +293,72 @@ const Analytics = () => {
             selectedDate={selectedDate}
           />
 
-          {/* Top Products */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Produk Terlaris - {getPeriodTitle(dateRange)}</CardTitle>
-              <CardDescription>5 produk dengan penjualan tertinggi untuk periode ini</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {topProducts.map((product, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-                        {index + 1}
+          {/* Lower Section - Responsive Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            {/* Top Products */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg md:text-xl">Produk Terlaris - {getPeriodTitle(dateRange)}</CardTitle>
+                <CardDescription className="text-sm">5 produk dengan penjualan tertinggi untuk periode ini</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 md:space-y-4">
+                  {topProducts.map((product, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 md:p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm md:text-base truncate">{product.name}</p>
+                          <p className="text-xs md:text-sm text-muted-foreground">{product.sold} unit terjual</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">{product.sold} unit terjual</p>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-bold text-sm md:text-base">Rp {product.revenue.toLocaleString('id-ID')}</p>
+                        <p className="text-xs text-muted-foreground">Revenue</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold">Rp {product.revenue.toLocaleString('id-ID')}</p>
-                      <p className="text-sm text-muted-foreground">Revenue</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Category Performance */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Performa Kategori</CardTitle>
-              <CardDescription>Detail penjualan per kategori</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {categoryData.map((category, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                      />
-                      <div>
-                        <p className="font-medium">{category.name}</p>
-                        <p className="text-sm text-muted-foreground">{category.value}% dari total penjualan</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold">Rp {category.sales.toLocaleString('id-ID')}</p>
-                      <div className="w-24 bg-gray-200 rounded-full h-2 mt-1">
+            {/* Category Performance */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg md:text-xl">Performa Kategori</CardTitle>
+                <CardDescription className="text-sm">Detail penjualan per kategori</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 md:space-y-4">
+                  {categoryData.map((category, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 md:p-4 border rounded-lg">
+                      <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
                         <div
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{ width: `${category.value}%` }}
+                          className="w-3 h-3 md:w-4 md:h-4 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
                         />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm md:text-base truncate">{category.name}</p>
+                          <p className="text-xs md:text-sm text-muted-foreground">{category.value}% dari total penjualan</p>
+                        </div>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-bold text-sm md:text-base">Rp {category.sales.toLocaleString('id-ID')}</p>
+                        <div className="w-16 md:w-24 bg-gray-200 rounded-full h-2 mt-1">
+                          <div
+                            className="bg-primary h-2 rounded-full transition-all"
+                            style={{ width: `${category.value}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </main>
       </div>
     </>
