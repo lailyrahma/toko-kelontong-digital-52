@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Transaction from "./pages/Transaction";
+import TransactionSales from "./pages/TransactionSales";
 import Stock from "./pages/Stock";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
@@ -44,6 +45,15 @@ const App = () => (
                 <SidebarProvider>
                   <div className="min-h-screen flex w-full">
                     <Transaction />
+                  </div>
+                </SidebarProvider>
+              </ProtectedRoute>
+            } />
+            <Route path="/transaction-sales" element={
+              <ProtectedRoute>
+                <SidebarProvider>
+                  <div className="min-h-screen flex w-full">
+                    <TransactionSales />
                   </div>
                 </SidebarProvider>
               </ProtectedRoute>

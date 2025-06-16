@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -8,9 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Pencil, Package, AlertTriangle } from 'lucide-react';
+import { Search, Plus, Pencil, Package, AlertTriangle, Camera, Upload, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import ProductImageUpload from '@/components/products/ProductImageUpload';
 
 interface Product {
   id: string;
@@ -24,11 +24,11 @@ interface Product {
 
 const Stock = () => {
   const [products, setProducts] = useState<Product[]>([
-    { id: '1', name: 'Beras Premium 5kg', category: 'Sembako', price: 75000, stock: 20, barcode: '1234567890123' },
-    { id: '2', name: 'Minyak Goreng 1L', category: 'Sembako', price: 18000, stock: 5, barcode: '1234567890124' },
+    { id: '1', name: 'Beras Premium 5kg', category: 'Sembako', price: 75000, stock: 20, barcode: '1234567890123', image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=200&h=200&fit=crop' },
+    { id: '2', name: 'Minyak Goreng 1L', category: 'Sembako', price: 18000, stock: 5, barcode: '1234567890124', image: 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=200&h=200&fit=crop' },
     { id: '3', name: 'Gula Pasir 1kg', category: 'Sembako', price: 14000, stock: 0, barcode: '1234567890125' },
-    { id: '4', name: 'Indomie Goreng', category: 'Makanan Instan', price: 3500, stock: 100, barcode: '1234567890126' },
-    { id: '5', name: 'Teh Botol Sosro', category: 'Minuman', price: 4000, stock: 8, barcode: '1234567890127' },
+    { id: '4', name: 'Indomie Goreng', category: 'Makanan Instan', price: 3500, stock: 100, barcode: '1234567890126', image: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?w=200&h=200&fit=crop' },
+    { id: '5', name: 'Teh Botol Sosro', category: 'Minuman', price: 4000, stock: 8, barcode: '1234567890127', image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200&h=200&fit=crop' },
     { id: '6', name: 'Sabun Mandi Lifebuoy', category: 'Kebersihan', price: 8500, stock: 30, barcode: '1234567890128' },
   ]);
 
@@ -37,7 +37,10 @@ const Stock = () => {
   const [filterStock, setFilterStock] = useState('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showImageDialog, setShowImageDialog] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingImageProduct, setEditingImageProduct] = useState<Product | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string>('');
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
     name: '',
     category: '',
@@ -49,6 +52,16 @@ const Stock = () => {
   const { toast } = useToast();
 
   const categories = ['Sembako', 'Makanan Instan', 'Minuman', 'Kebersihan', 'Snack', 'Frozen Food'];
+
+  // Placeholder images untuk demo
+  const placeholderImages = [
+    'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=200&h=200&fit=crop',
+    'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=200&h=200&fit=crop',
+    'https://images.unsplash.com/photo-1493962853295-0fd70327578a?w=200&h=200&fit=crop',
+    'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200&h=200&fit=crop',
+    'https://images.unsplash.com/photo-1574781330855-d0db1d65d95b?w=200&h=200&fit=crop',
+    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop',
+  ];
 
   const getStockStatus = (stock: number) => {
     if (stock === 0) return { status: 'Habis', variant: 'destructive' as const, className: 'stock-empty' };
@@ -117,15 +130,31 @@ const Stock = () => {
     setShowEditDialog(true);
   };
 
-  const handleImageUpdate = (productId: string, imageUrl: string) => {
+  const openImageDialog = (product: Product) => {
+    setEditingImageProduct(product);
+    setSelectedImage(product.image || '');
+    setShowImageDialog(true);
+  };
+
+  const handleImageUpdate = () => {
+    if (!editingImageProduct) return;
+
     setProducts(products.map(p => 
-      p.id === productId ? { ...p, image: imageUrl } : p
+      p.id === editingImageProduct.id ? { ...p, image: selectedImage || undefined } : p
     ));
+    
+    setShowImageDialog(false);
+    setEditingImageProduct(null);
+    setSelectedImage('');
     
     toast({
       title: "Foto Produk Diperbarui",
       description: "Foto produk berhasil disimpan",
     });
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage('');
   };
 
   const stockSummary = {
@@ -307,8 +336,8 @@ const Stock = () => {
               return (
                 <Card key={product.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div className="aspect-square bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center overflow-hidden">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="aspect-square bg-gray-100 rounded-lg w-20 h-20 flex items-center justify-center overflow-hidden relative group">
                         {product.image ? (
                           <img 
                             src={product.image} 
@@ -316,8 +345,19 @@ const Stock = () => {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <Package className="h-8 w-8 text-muted-foreground" />
+                          <Package className="h-10 w-10 text-muted-foreground" />
                         )}
+                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => openImageDialog(product)}
+                            className="text-xs"
+                          >
+                            <Camera className="h-3 w-3 mr-1" />
+                            Edit
+                          </Button>
+                        </div>
                       </div>
                       <Button
                         variant="ghost"
@@ -329,14 +369,6 @@ const Stock = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="mb-3 flex justify-center">
-                      <ProductImageUpload
-                        productId={product.id}
-                        currentImage={product.image}
-                        onImageUpdate={handleImageUpdate}
-                      />
-                    </div>
-                    
                     <h3 className="font-medium mb-2 line-clamp-2">{product.name}</h3>
                     <p className="text-sm text-muted-foreground mb-2">{product.category}</p>
                     <div className="space-y-2">
@@ -440,6 +472,117 @@ const Stock = () => {
                 </Button>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Image Edit Dialog */}
+        <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Edit Foto Produk</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* Current Image Preview */}
+              {selectedImage && (
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+                        <img 
+                          src={selectedImage} 
+                          alt="Preview" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">Foto Saat Ini</p>
+                        <p className="text-xs text-muted-foreground">Klik simpan untuk menggunakan foto ini</p>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={handleRemoveImage}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Upload Section */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-600 mb-2">Upload foto produk</p>
+                    <Button variant="outline" size="sm" disabled>
+                      <Camera className="h-4 w-4 mr-2" />
+                      Pilih File
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Format: JPG, PNG (Max 2MB)
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Placeholder Images */}
+              <div>
+                <h4 className="text-sm font-medium mb-3">Atau pilih dari galeri:</h4>
+                <div className="grid grid-cols-4 gap-2">
+                  {placeholderImages.map((image, index) => (
+                    <Card 
+                      key={index}
+                      className={`cursor-pointer transition-all hover:shadow-md ${
+                        selectedImage === image ? 'ring-2 ring-primary' : ''
+                      }`}
+                      onClick={() => setSelectedImage(image)}
+                    >
+                      <CardContent className="p-2">
+                        <div className="aspect-square bg-gray-100 rounded overflow-hidden">
+                          <img 
+                            src={image} 
+                            alt={`Option ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* No Image Option */}
+              <Card 
+                className={`cursor-pointer transition-all hover:shadow-md ${
+                  selectedImage === '' ? 'ring-2 ring-primary' : ''
+                }`}
+                onClick={() => setSelectedImage('')}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <Package className="h-6 w-6 text-gray-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Tanpa Foto</p>
+                      <p className="text-xs text-muted-foreground">Gunakan icon default</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="flex space-x-2">
+              <Button variant="outline" onClick={() => setShowImageDialog(false)} className="flex-1">
+                Batal
+              </Button>
+              <Button onClick={handleImageUpdate} className="flex-1">
+                Simpan
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
