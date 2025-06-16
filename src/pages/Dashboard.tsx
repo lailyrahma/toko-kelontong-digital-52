@@ -1,17 +1,75 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import AppSidebar from '@/components/AppSidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, ShoppingCart, Package, TrendingUp, AlertTriangle } from 'lucide-react';
+import { ShoppingCart, Package, TrendingUp, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import NotificationCenter from '@/components/notifications/NotificationCenter';
+import TransactionHistory from '@/components/transaction/TransactionHistory';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const Dashboard = () => {
   const { user, store } = useUser();
   const navigate = useNavigate();
+  const [showTransactionHistory, setShowTransactionHistory] = useState(false);
+  const [showSalesDetail, setShowSalesDetail] = useState(false);
+  const [showProductDetail, setShowProductDetail] = useState(false);
+  const [showProfitDetail, setShowProfitDetail] = useState(false);
+
+  // Sample notifications data
+  const [notifications, setNotifications] = useState([
+    {
+      id: '1',
+      type: 'stock_alert' as const,
+      title: 'Stok Gula Pasir Habis',
+      message: 'Gula Pasir 1kg sudah habis. Segera lakukan restock untuk menghindari kehilangan penjualan.',
+      time: '5 menit lalu',
+      read: false,
+      priority: 'high' as const,
+      actionable: true
+    },
+    {
+      id: '2',
+      type: 'stock_alert' as const,
+      title: 'Stok Minyak Goreng Menipis',
+      message: 'Minyak Goreng 1L tersisa 5 unit. Pertimbangkan untuk menambah stok.',
+      time: '1 jam lalu',
+      read: false,
+      priority: 'medium' as const,
+      actionable: true
+    },
+    {
+      id: '3',
+      type: 'transaction' as const,
+      title: 'Transaksi Berhasil',
+      message: 'Transaksi TRX001 sebesar Rp 125.000 telah berhasil diproses.',
+      time: '2 jam lalu',
+      read: true,
+      priority: 'low' as const,
+      actionable: false
+    }
+  ]);
+
+  // Sample transaction data
+  const sampleTransactions = [
+    {
+      id: 'TRX001',
+      date: '2025-06-16',
+      time: '14:30',
+      items: [
+        { id: '1', productName: 'Beras Premium 5kg', quantity: 1, price: 75000, subtotal: 75000 },
+        { id: '2', productName: 'Minyak Goreng 1L', quantity: 2, price: 18000, subtotal: 36000 },
+        { id: '3', productName: 'Indomie Goreng', quantity: 4, price: 3500, subtotal: 14000 }
+      ],
+      total: 125000,
+      paymentMethod: 'cash' as const,
+      status: 'completed' as const
+    },
+    // ... keep existing code (other sample transactions)
+  ];
 
   const currentDate = new Date().toLocaleDateString('id-ID', {
     weekday: 'long',
@@ -26,14 +84,16 @@ const Dashboard = () => {
       value: 'Rp 2.450.000',
       description: '23 transaksi',
       icon: ShoppingCart,
-      trend: '+12%'
+      trend: '+12%',
+      onClick: () => setShowSalesDetail(true)
     },
     {
       title: 'Total Produk',
       value: '1.234',
       description: '45 kategori',
       icon: Package,
-      trend: '+3%'
+      trend: '+3%',
+      onClick: () => setShowProductDetail(true)
     },
     {
       title: 'Stok Menipis',
@@ -48,7 +108,8 @@ const Dashboard = () => {
       value: 'Rp 45.2 Juta',
       description: 'Target 85%',
       icon: TrendingUp,
-      trend: '+8%'
+      trend: '+8%',
+      onClick: () => setShowProfitDetail(true)
     }
   ];
 
@@ -65,6 +126,24 @@ const Dashboard = () => {
     { name: 'Gula Pasir 1kg', stock: 0, category: 'Sembako', status: 'empty' },
   ];
 
+  const handleNotificationRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === id ? { ...notif, read: true } : notif
+      )
+    );
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev => 
+      prev.map(notif => ({ ...notif, read: true }))
+    );
+  };
+
+  const handleViewTransaction = (transaction: any) => {
+    console.log('View transaction:', transaction);
+  };
+
   return (
     <>
       <AppSidebar />
@@ -80,19 +159,26 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-4 w-4 md:h-5 md:w-5" />
-              <Badge className="absolute -top-1 -right-1 h-4 w-4 md:h-5 md:w-5 flex items-center justify-center p-0 text-xs">
-                3
-              </Badge>
-            </Button>
+            <NotificationCenter
+              notifications={notifications}
+              onMarkAsRead={handleNotificationRead}
+              onMarkAllAsRead={handleMarkAllAsRead}
+            />
             <div className="hidden sm:flex items-center space-x-2">
-              <div className="w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center">
+              <div 
+                className="w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => navigate('/profile')}
+              >
                 <span className="text-white text-xs md:text-sm font-bold">
                   {user?.name.charAt(0)}
                 </span>
               </div>
-              <span className="text-xs md:text-sm font-medium hidden md:block">{user?.name}</span>
+              <span 
+                className="text-xs md:text-sm font-medium hidden md:block cursor-pointer hover:underline"
+                onClick={() => navigate('/profile')}
+              >
+                {user?.name}
+              </span>
             </div>
           </div>
         </header>
@@ -103,9 +189,7 @@ const Dashboard = () => {
             {stats.map((stat, index) => (
               <Card 
                 key={index} 
-                className={`cursor-pointer transition-all hover:shadow-lg ${
-                  stat.onClick ? 'hover:border-primary' : ''
-                }`}
+                className="cursor-pointer transition-all hover:shadow-lg hover:border-primary"
                 onClick={stat.onClick}
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-4">
@@ -142,7 +226,11 @@ const Dashboard = () => {
               <CardContent className="p-4 md:p-6 pt-0">
                 <div className="space-y-3 md:space-y-4">
                   {recentTransactions.map((transaction) => (
-                    <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div 
+                      key={transaction.id} 
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={() => setShowTransactionHistory(true)}
+                    >
                       <div className="min-w-0 flex-1">
                         <p className="font-medium text-sm md:text-base">{transaction.id}</p>
                         <p className="text-xs md:text-sm text-muted-foreground">
@@ -212,6 +300,100 @@ const Dashboard = () => {
             </Card>
           </div>
         </main>
+
+        {/* Transaction History Dialog */}
+        <Dialog open={showTransactionHistory} onOpenChange={setShowTransactionHistory}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+            <DialogHeader>
+              <DialogTitle>Riwayat Transaksi Lengkap</DialogTitle>
+              <DialogDescription>
+                Semua transaksi yang telah dilakukan hari ini
+              </DialogDescription>
+            </DialogHeader>
+            <div className="overflow-y-auto">
+              <TransactionHistory
+                transactions={sampleTransactions}
+                onViewTransaction={handleViewTransaction}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Sales Detail Dialog */}
+        <Dialog open={showSalesDetail} onOpenChange={setShowSalesDetail}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Detail Penjualan Hari Ini</DialogTitle>
+              <DialogDescription>Breakdown penjualan per jam</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold">23</p>
+                  <p className="text-sm text-muted-foreground">Total Transaksi</p>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold">Rp 106,521</p>
+                  <p className="text-sm text-muted-foreground">Rata-rata per Transaksi</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h4 className="font-medium">Jam Tersibuk:</h4>
+                <p className="text-sm text-muted-foreground">14:00 - 15:00 (8 transaksi)</p>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Product Detail Dialog */}
+        <Dialog open={showProductDetail} onOpenChange={setShowProductDetail}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Detail Produk</DialogTitle>
+              <DialogDescription>Informasi stok dan kategori produk</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold">45</p>
+                  <p className="text-sm text-muted-foreground">Kategori</p>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold">98.2%</p>
+                  <p className="text-sm text-muted-foreground">Stok Tersedia</p>
+                </div>
+              </div>
+              <Button onClick={() => navigate('/stock')} className="w-full">
+                Kelola Stok Produk
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Profit Detail Dialog */}
+        <Dialog open={showProfitDetail} onOpenChange={setShowProfitDetail}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Detail Profit Bulan Ini</DialogTitle>
+              <DialogDescription>Breakdown keuntungan dan target</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold">85%</p>
+                  <p className="text-sm text-muted-foreground">Target Tercapai</p>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold">Rp 8.0 Juta</p>
+                  <p className="text-sm text-muted-foreground">Target Sisa</p>
+                </div>
+              </div>
+              <Button onClick={() => navigate('/analytics')} className="w-full">
+                Lihat Analytics Lengkap
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );

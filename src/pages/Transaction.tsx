@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -37,15 +36,61 @@ const Transaction = () => {
   const [showMobileCart, setShowMobileCart] = useState(false);
   const { toast } = useToast();
 
-  // Sample products
-  const products: Product[] = [
-    { id: '1', name: 'Beras Premium 5kg', category: 'Sembako', price: 75000, stock: 20, barcode: '1234567890123' },
-    { id: '2', name: 'Minyak Goreng 1L', category: 'Sembako', price: 18000, stock: 15, barcode: '1234567890124' },
-    { id: '3', name: 'Gula Pasir 1kg', category: 'Sembako', price: 14000, stock: 0, barcode: '1234567890125' },
-    { id: '4', name: 'Indomie Goreng', category: 'Makanan Instan', price: 3500, stock: 100, barcode: '1234567890126' },
-    { id: '5', name: 'Teh Botol Sosro', category: 'Minuman', price: 4000, stock: 50, barcode: '1234567890127' },
-    { id: '6', name: 'Sabun Mandi Lifebuoy', category: 'Kebersihan', price: 8500, stock: 30, barcode: '1234567890128' },
-  ];
+  // Sample products with images
+  const [products, setProducts] = useState<Product[]>([
+    { 
+      id: '1', 
+      name: 'Beras Premium 5kg', 
+      category: 'Sembako', 
+      price: 75000, 
+      stock: 20, 
+      barcode: '1234567890123',
+      image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=200&h=200&fit=crop'
+    },
+    { 
+      id: '2', 
+      name: 'Minyak Goreng 1L', 
+      category: 'Sembako', 
+      price: 18000, 
+      stock: 15, 
+      barcode: '1234567890124',
+      image: 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=200&h=200&fit=crop'
+    },
+    { 
+      id: '3', 
+      name: 'Gula Pasir 1kg', 
+      category: 'Sembako', 
+      price: 14000, 
+      stock: 0, 
+      barcode: '1234567890125'
+    },
+    { 
+      id: '4', 
+      name: 'Indomie Goreng', 
+      category: 'Makanan Instan', 
+      price: 3500, 
+      stock: 100, 
+      barcode: '1234567890126',
+      image: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?w=200&h=200&fit=crop'
+    },
+    { 
+      id: '5', 
+      name: 'Teh Botol Sosro', 
+      category: 'Minuman', 
+      price: 4000, 
+      stock: 50, 
+      barcode: '1234567890127',
+      image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200&h=200&fit=crop'
+    },
+    { 
+      id: '6', 
+      name: 'Sabun Mandi Lifebuoy', 
+      category: 'Kebersihan', 
+      price: 8500, 
+      stock: 30, 
+      barcode: '1234567890128'
+    },
+  ]);
 
   const categories = ['all', 'Sembako', 'Makanan Instan', 'Minuman', 'Kebersihan'];
 
@@ -55,6 +100,30 @@ const Transaction = () => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleImageUpdate = (productId: string, imageUrl: string) => {
+    setProducts(prev => 
+      prev.map(product => 
+        product.id === productId 
+          ? { ...product, image: imageUrl || undefined }
+          : product
+      )
+    );
+    
+    // Update cart items if the product is already in cart
+    setCartItems(prev =>
+      prev.map(item =>
+        item.id === productId
+          ? { ...item, image: imageUrl || undefined }
+          : item
+      )
+    );
+
+    toast({
+      title: "Foto Produk Diperbarui",
+      description: "Foto produk berhasil diperbarui",
+    });
+  };
 
   const addToCart = (product: Product) => {
     if (product.stock === 0) {
@@ -199,6 +268,8 @@ const Transaction = () => {
                   key={product.id}
                   product={product}
                   onAddToCart={addToCart}
+                  onImageUpdate={handleImageUpdate}
+                  showImageUpload={true}
                 />
               ))}
             </div>

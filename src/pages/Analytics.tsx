@@ -3,29 +3,55 @@ import React, { useState } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Calendar as CalendarIcon, TrendingUp, ShoppingCart, Package, DollarSign } from 'lucide-react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { TrendingUp, ShoppingCart, Package, DollarSign } from 'lucide-react';
+import DateRangeFilter from '@/components/analytics/DateRangeFilter';
 
 const Analytics = () => {
   const [dateRange, setDateRange] = useState('today');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
-  // Sample data
-  const salesData = [
-    { name: 'Senin', sales: 2400000, transactions: 45 },
-    { name: 'Selasa', sales: 1398000, transactions: 32 },
-    { name: 'Rabu', sales: 9800000, transactions: 78 },
-    { name: 'Kamis', sales: 3908000, transactions: 56 },
-    { name: 'Jumat', sales: 4800000, transactions: 67 },
-    { name: 'Sabtu', sales: 3800000, transactions: 89 },
-    { name: 'Minggu', sales: 4300000, transactions: 73 },
-  ];
+  // Sample data yang berubah berdasarkan filter
+  const getSalesData = (range: string) => {
+    const baseData = [
+      { name: 'Senin', sales: 2400000, transactions: 45 },
+      { name: 'Selasa', sales: 1398000, transactions: 32 },
+      { name: 'Rabu', sales: 9800000, transactions: 78 },
+      { name: 'Kamis', sales: 3908000, transactions: 56 },
+      { name: 'Jumat', sales: 4800000, transactions: 67 },
+      { name: 'Sabtu', sales: 3800000, transactions: 89 },
+      { name: 'Minggu', sales: 4300000, transactions: 73 },
+    ];
+
+    switch (range) {
+      case 'today':
+        return [{ name: 'Hari Ini', sales: 2450000, transactions: 23 }];
+      case 'yesterday':
+        return [{ name: 'Kemarin', sales: 2100000, transactions: 19 }];
+      case 'week':
+        return baseData;
+      case 'month':
+        return [
+          { name: 'Minggu 1', sales: 15400000, transactions: 156 },
+          { name: 'Minggu 2', sales: 18200000, transactions: 189 },
+          { name: 'Minggu 3', sales: 16800000, transactions: 172 },
+          { name: 'Minggu 4', sales: 19600000, transactions: 203 },
+        ];
+      case 'year':
+        return [
+          { name: 'Jan', sales: 45200000, transactions: 567 },
+          { name: 'Feb', sales: 52100000, transactions: 634 },
+          { name: 'Mar', sales: 48900000, transactions: 598 },
+          { name: 'Apr', sales: 51200000, transactions: 623 },
+          { name: 'May', sales: 55800000, transactions: 687 },
+          { name: 'Jun', sales: 49300000, transactions: 612 },
+        ];
+      default:
+        return baseData;
+    }
+  };
+
+  const salesData = getSalesData(dateRange);
 
   const categoryData = [
     { name: 'Sembako', value: 35, sales: 15750000 },
@@ -52,36 +78,69 @@ const Analytics = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-  const stats = [
-    {
-      title: 'Total Penjualan',
-      value: 'Rp 45.2 Juta',
-      change: '+12.5%',
-      icon: DollarSign,
-      description: 'Bulan ini'
-    },
-    {
-      title: 'Total Transaksi',
-      value: '1,234',
-      change: '+8.2%',
-      icon: ShoppingCart,
-      description: 'Bulan ini'
-    },
-    {
-      title: 'Produk Terjual',
-      value: '8,945',
-      change: '+15.3%',
-      icon: Package,
-      description: 'Unit terjual'
-    },
-    {
-      title: 'Rata-rata per Transaksi',
-      value: 'Rp 36,650',
-      change: '+4.1%',
-      icon: TrendingUp,
-      description: 'Per transaksi'
+  const getStatsForPeriod = (period: string) => {
+    const baseSales = 45200000;
+    const baseTransactions = 1234;
+    const baseProducts = 8945;
+    const baseAverage = 36650;
+
+    const multipliers: { [key: string]: number } = {
+      'today': 0.05,
+      'yesterday': 0.045,
+      'week': 0.2,
+      'month': 1,
+      'year': 12,
+      'custom': 1
+    };
+
+    const multiplier = multipliers[period] || 1;
+    
+    return [
+      {
+        title: 'Total Penjualan',
+        value: `Rp ${(baseSales * multiplier / 1000000).toFixed(1)} Juta`,
+        change: '+12.5%',
+        icon: DollarSign,
+        description: period === 'today' ? 'Hari ini' : period === 'week' ? 'Minggu ini' : period === 'month' ? 'Bulan ini' : 'Tahun ini'
+      },
+      {
+        title: 'Total Transaksi',
+        value: Math.round(baseTransactions * multiplier).toLocaleString(),
+        change: '+8.2%',
+        icon: ShoppingCart,
+        description: period === 'today' ? 'Hari ini' : period === 'week' ? 'Minggu ini' : period === 'month' ? 'Bulan ini' : 'Tahun ini'
+      },
+      {
+        title: 'Produk Terjual',
+        value: Math.round(baseProducts * multiplier).toLocaleString(),
+        change: '+15.3%',
+        icon: Package,
+        description: 'Unit terjual'
+      },
+      {
+        title: 'Rata-rata per Transaksi',
+        value: `Rp ${baseAverage.toLocaleString()}`,
+        change: '+4.1%',
+        icon: TrendingUp,
+        description: 'Per transaksi'
+      }
+    ];
+  };
+
+  const stats = getStatsForPeriod(dateRange);
+
+  const getPeriodTitle = (period: string) => {
+    switch (period) {
+      case 'today': return 'Hari Ini';
+      case 'yesterday': return 'Kemarin';
+      case 'week': return '7 Hari Terakhir';
+      case 'month': return '30 Hari Terakhir';
+      case 'quarter': return '3 Bulan Terakhir';
+      case 'year': return 'Tahun Ini';
+      case 'custom': return 'Custom';
+      default: return 'Periode Dipilih';
     }
-  ];
+  };
 
   return (
     <>
@@ -92,41 +151,17 @@ const Analytics = () => {
             <SidebarTrigger />
             <h1 className="text-2xl font-bold">Analytics & Insights</h1>
           </div>
-          <div className="flex items-center space-x-4">
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="today">Hari Ini</SelectItem>
-                <SelectItem value="week">Minggu Ini</SelectItem>
-                <SelectItem value="month">Bulan Ini</SelectItem>
-                <SelectItem value="year">Tahun Ini</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
-              </SelectContent>
-            </Select>
-            {dateRange === 'custom' && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, 'PPP', { locale: id }) : 'Pilih tanggal'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            )}
-          </div>
         </header>
 
         <main className="flex-1 p-6 bg-gray-50 space-y-6">
+          {/* Date Range Filter */}
+          <DateRangeFilter
+            dateRange={dateRange}
+            selectedDate={selectedDate}
+            onDateRangeChange={setDateRange}
+            onDateChange={setSelectedDate}
+          />
+
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
@@ -156,8 +191,10 @@ const Analytics = () => {
             {/* Sales Chart */}
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>Trend Penjualan</CardTitle>
-                <CardDescription>Penjualan harian dalam seminggu terakhir</CardDescription>
+                <CardTitle>Trend Penjualan - {getPeriodTitle(dateRange)}</CardTitle>
+                <CardDescription>
+                  Penjualan untuk periode {getPeriodTitle(dateRange).toLowerCase()}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -225,8 +262,8 @@ const Analytics = () => {
           {/* Top Products */}
           <Card>
             <CardHeader>
-              <CardTitle>Produk Terlaris</CardTitle>
-              <CardDescription>5 produk dengan penjualan tertinggi bulan ini</CardDescription>
+              <CardTitle>Produk Terlaris - {getPeriodTitle(dateRange)}</CardTitle>
+              <CardDescription>5 produk dengan penjualan tertinggi untuk periode ini</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
