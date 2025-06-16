@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -37,7 +38,7 @@ const Transaction = () => {
   const { toast } = useToast();
 
   // Sample products with images
-  const [products, setProducts] = useState<Product[]>([
+  const [products] = useState<Product[]>([
     { 
       id: '1', 
       name: 'Beras Premium 5kg', 
@@ -100,30 +101,6 @@ const Transaction = () => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
-  const handleImageUpdate = (productId: string, imageUrl: string) => {
-    setProducts(prev => 
-      prev.map(product => 
-        product.id === productId 
-          ? { ...product, image: imageUrl || undefined }
-          : product
-      )
-    );
-    
-    // Update cart items if the product is already in cart
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === productId
-          ? { ...item, image: imageUrl || undefined }
-          : item
-      )
-    );
-
-    toast({
-      title: "Foto Produk Diperbarui",
-      description: "Foto produk berhasil diperbarui",
-    });
-  };
 
   const addToCart = (product: Product) => {
     if (product.stock === 0) {
@@ -268,8 +245,6 @@ const Transaction = () => {
                   key={product.id}
                   product={product}
                   onAddToCart={addToCart}
-                  onImageUpdate={handleImageUpdate}
-                  showImageUpload={true}
                 />
               ))}
             </div>
