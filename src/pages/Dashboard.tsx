@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import AppSidebar from '@/components/AppSidebar';
@@ -8,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart, Package, TrendingUp, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
-import TransactionHistory from '@/components/transaction/TransactionHistory';
+import TransactionHistoryWithFilters from '@/components/transaction/TransactionHistoryWithFilters';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const Dashboard = () => {
@@ -307,11 +308,11 @@ const Dashboard = () => {
             <DialogHeader>
               <DialogTitle>Riwayat Transaksi Lengkap</DialogTitle>
               <DialogDescription>
-                Semua transaksi yang telah dilakukan hari ini
+                Filter dan lihat transaksi berdasarkan periode waktu
               </DialogDescription>
             </DialogHeader>
             <div className="overflow-y-auto">
-              <TransactionHistory
+              <TransactionHistoryWithFilters
                 transactions={sampleTransactions}
                 onViewTransaction={handleViewTransaction}
               />

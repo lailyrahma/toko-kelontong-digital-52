@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -11,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Pencil, Package, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import ProductImageUpload from '@/components/products/ProductImageUpload';
 
 interface Product {
   id: string;
@@ -115,6 +115,17 @@ const Stock = () => {
   const startEdit = (product: Product) => {
     setEditingProduct({ ...product });
     setShowEditDialog(true);
+  };
+
+  const handleImageUpdate = (productId: string, imageUrl: string) => {
+    setProducts(products.map(p => 
+      p.id === productId ? { ...p, image: imageUrl } : p
+    ));
+    
+    toast({
+      title: "Foto Produk Diperbarui",
+      description: "Foto produk berhasil disimpan",
+    });
   };
 
   const stockSummary = {
@@ -297,8 +308,16 @@ const Stock = () => {
                 <Card key={product.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
-                      <div className="aspect-square bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center">
-                        <Package className="h-8 w-8 text-muted-foreground" />
+                      <div className="aspect-square bg-gray-100 rounded-lg w-16 h-16 flex items-center justify-center overflow-hidden">
+                        {product.image ? (
+                          <img 
+                            src={product.image} 
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Package className="h-8 w-8 text-muted-foreground" />
+                        )}
                       </div>
                       <Button
                         variant="ghost"
@@ -310,6 +329,14 @@ const Stock = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
+                    <div className="mb-3 flex justify-center">
+                      <ProductImageUpload
+                        productId={product.id}
+                        currentImage={product.image}
+                        onImageUpdate={handleImageUpdate}
+                      />
+                    </div>
+                    
                     <h3 className="font-medium mb-2 line-clamp-2">{product.name}</h3>
                     <p className="text-sm text-muted-foreground mb-2">{product.category}</p>
                     <div className="space-y-2">

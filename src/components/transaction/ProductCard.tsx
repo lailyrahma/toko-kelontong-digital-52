@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Package } from 'lucide-react';
-import ProductImageUpload from '@/components/products/ProductImageUpload';
 
 interface Product {
   id: string;
@@ -19,11 +18,9 @@ interface Product {
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
-  onImageUpdate?: (productId: string, imageUrl: string) => void;
-  showImageUpload?: boolean;
 }
 
-const ProductCard = ({ product, onAddToCart, onImageUpdate, showImageUpload = false }: ProductCardProps) => {
+const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
   const getStockBadge = (stock: number) => {
     if (stock === 0) return <Badge variant="destructive" className="stock-empty text-xs">Habis</Badge>;
     if (stock < 10) return <Badge variant="secondary" className="stock-low text-xs">Sedikit</Badge>;
@@ -45,16 +42,6 @@ const ProductCard = ({ product, onAddToCart, onImageUpdate, showImageUpload = fa
             <Package className="h-8 w-8 md:h-12 md:w-12 text-muted-foreground" />
           )}
         </div>
-        
-        {showImageUpload && onImageUpdate && (
-          <div className="mb-2 flex justify-center">
-            <ProductImageUpload
-              productId={product.id}
-              currentImage={product.image}
-              onImageUpdate={onImageUpdate}
-            />
-          </div>
-        )}
         
         <h3 className="font-medium mb-1 line-clamp-2 text-sm md:text-base">{product.name}</h3>
         <p className="text-xs md:text-sm text-muted-foreground mb-2">{product.category}</p>
