@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, ShoppingCart, Package, DollarSign } from 'lucide-react';
 import DateRangeFilter from '@/components/analytics/DateRangeFilter';
+import AnalyticsTransactionHistory from '@/components/analytics/AnalyticsTransactionHistory';
 
 const Analytics = () => {
   const [dateRange, setDateRange] = useState('today');
@@ -258,6 +259,12 @@ const Analytics = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Riwayat Transaksi */}
+          <AnalyticsTransactionHistory
+            dateRange={dateRange}
+            selectedDate={selectedDate}
+          />
 
           {/* Top Products */}
           <Card>

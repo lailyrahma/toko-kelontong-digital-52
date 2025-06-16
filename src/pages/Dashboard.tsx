@@ -19,6 +19,7 @@ const Dashboard = () => {
   const [showSalesDetail, setShowSalesDetail] = useState(false);
   const [showProductDetail, setShowProductDetail] = useState(false);
   const [showProfitDetail, setShowProfitDetail] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
 
   // Sample notifications data
   const [notifications, setNotifications] = useState([
@@ -54,7 +55,7 @@ const Dashboard = () => {
     }
   ]);
 
-  // Sample transaction data
+  // Sample transaction data with detailed items
   const sampleTransactions = [
     {
       id: 'TRX001',
@@ -69,7 +70,45 @@ const Dashboard = () => {
       paymentMethod: 'cash' as const,
       status: 'completed' as const
     },
-    // ... keep existing code (other sample transactions)
+    {
+      id: 'TRX002',
+      date: '2025-06-16',
+      time: '14:15',
+      items: [
+        { id: '4', productName: 'Gula Pasir 1kg', quantity: 2, price: 14000, subtotal: 28000 },
+        { id: '5', productName: 'Teh Botol Sosro', quantity: 3, price: 4000, subtotal: 12000 },
+        { id: '6', productName: 'Sabun Mandi Lifebuoy', quantity: 3, price: 8500, subtotal: 25500 }
+      ],
+      total: 65500,
+      paymentMethod: 'qris' as const,
+      status: 'completed' as const
+    },
+    {
+      id: 'TRX003',
+      date: '2025-06-16',
+      time: '14:00',
+      items: [
+        { id: '1', productName: 'Beras Premium 5kg', quantity: 2, price: 75000, subtotal: 150000 },
+        { id: '2', productName: 'Minyak Goreng 1L', quantity: 1, price: 18000, subtotal: 18000 },
+        { id: '7', productName: 'Deterjen Rinso', quantity: 1, price: 12000, subtotal: 12000 },
+        { id: '8', productName: 'Kopi Kapal Api', quantity: 2, price: 15000, subtotal: 30000 }
+      ],
+      total: 210000,
+      paymentMethod: 'debit' as const,
+      status: 'completed' as const
+    },
+    {
+      id: 'TRX004',
+      date: '2025-06-16',
+      time: '13:45',
+      items: [
+        { id: '3', productName: 'Indomie Goreng', quantity: 6, price: 3500, subtotal: 21000 },
+        { id: '5', productName: 'Teh Botol Sosro', quantity: 6, price: 4000, subtotal: 24000 }
+      ],
+      total: 45000,
+      paymentMethod: 'cash' as const,
+      status: 'completed' as const
+    },
   ];
 
   const currentDate = new Date().toLocaleDateString('id-ID', {
@@ -114,12 +153,15 @@ const Dashboard = () => {
     }
   ];
 
-  const recentTransactions = [
-    { id: 'TRX001', time: '14:30', items: 5, total: 'Rp 125.000', method: 'Tunai' },
-    { id: 'TRX002', time: '14:15', items: 3, total: 'Rp 85.000', method: 'QRIS' },
-    { id: 'TRX003', time: '14:00', items: 8, total: 'Rp 210.000', method: 'Debit' },
-    { id: 'TRX004', time: '13:45', items: 2, total: 'Rp 45.000', method: 'Tunai' },
-  ];
+  const recentTransactions = sampleTransactions.slice(0, 4).map(transaction => ({
+    id: transaction.id,
+    time: transaction.time,
+    items: transaction.items.length,
+    total: `Rp ${transaction.total.toLocaleString('id-ID')}`,
+    method: transaction.paymentMethod === 'cash' ? 'Tunai' : 
+             transaction.paymentMethod === 'qris' ? 'QRIS' : 'Debit',
+    fullTransaction: transaction
+  }));
 
   const lowStockItems = [
     { name: 'Beras Premium 5kg', stock: 8, category: 'Sembako', status: 'low' },
@@ -143,6 +185,18 @@ const Dashboard = () => {
 
   const handleViewTransaction = (transaction: any) => {
     console.log('View transaction:', transaction);
+  };
+
+  const handleTransactionClick = (recentTransaction: any) => {
+    setSelectedTransaction(recentTransaction.fullTransaction);
+  };
+
+  const getPaymentMethodIcon = (method: string) => {
+    switch (method) {
+      case 'qris': return '📱';
+      case 'debit': return '💳';
+      default: return '💵';
+    }
   };
 
   return (
@@ -230,7 +284,7 @@ const Dashboard = () => {
                     <div 
                       key={transaction.id} 
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
-                      onClick={() => setShowTransactionHistory(true)}
+                      onClick={() => handleTransactionClick(transaction)}
                     >
                       <div className="min-w-0 flex-1">
                         <p className="font-medium text-sm md:text-base">{transaction.id}</p>
@@ -301,6 +355,54 @@ const Dashboard = () => {
             </Card>
           </div>
         </main>
+
+        {/* Transaction Detail Dialog for Recent Transactions */}
+        <Dialog open={!!selectedTransaction} onOpenChange={() => setSelectedTransaction(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Detail Transaksi {selectedTransaction?.id}</DialogTitle>
+              <DialogDescription>
+                {selectedTransaction?.date} • {selectedTransaction?.time}
+              </DialogDescription>
+            </DialogHeader>
+            {selectedTransaction && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium">Item yang dibeli:</h4>
+                  {selectedTransaction.items.map((item: any) => (
+                    <div key={item.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{item.productName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {item.quantity} x Rp {item.price.toLocaleString('id-ID')}
+                        </p>
+                      </div>
+                      <span className="font-medium">
+                        Rp {item.subtotal.toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t pt-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span>Metode Pembayaran:</span>
+                    <span className="flex items-center space-x-1">
+                      <span>{getPaymentMethodIcon(selectedTransaction.paymentMethod)}</span>
+                      <span>
+                        {selectedTransaction.paymentMethod === 'cash' ? 'Tunai' : 
+                         selectedTransaction.paymentMethod === 'qris' ? 'QRIS' : 'Kartu Debit'}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center font-bold text-lg border-t pt-2">
+                    <span>Total:</span>
+                    <span>Rp {selectedTransaction.total.toLocaleString('id-ID')}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Transaction History Dialog */}
         <Dialog open={showTransactionHistory} onOpenChange={setShowTransactionHistory}>
