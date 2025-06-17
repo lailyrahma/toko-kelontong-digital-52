@@ -145,15 +145,15 @@ const Analytics = () => {
   return (
     <>
       <AppSidebar />
-      <div className="flex-1 flex flex-col">
-        <header className="flex items-center justify-between p-4 md:p-6 border-b bg-white">
-          <div className="flex items-center space-x-2 md:space-x-4">
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="flex items-center justify-between p-3 md:p-6 border-b bg-white">
+          <div className="flex items-center space-x-2 md:space-x-4 min-w-0">
             <SidebarTrigger />
-            <h1 className="text-xl md:text-2xl font-bold">Analytics & Insights</h1>
+            <h1 className="text-lg md:text-2xl font-bold truncate">Analytics & Insights</h1>
           </div>
         </header>
 
-        <main className="flex-1 p-3 md:p-6 bg-gray-50 space-y-4 md:space-y-6">
+        <main className="flex-1 p-3 md:p-6 bg-gray-50 space-y-3 md:space-y-6 min-w-0 overflow-x-hidden">
           {/* Date Range Filter */}
           <DateRangeFilter
             dateRange={dateRange}
@@ -163,22 +163,22 @@ const Analytics = () => {
           />
 
           {/* Stats Overview - Responsive Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
             {stats.map((stat, index) => (
               <Card key={index} className="min-w-0">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium truncate">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-6">
+                  <CardTitle className="text-xs md:text-sm font-medium truncate pr-2">
                     {stat.title}
                   </CardTitle>
-                  <stat.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <stat.icon className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-xl md:text-2xl font-bold truncate">{stat.value}</div>
-                  <div className="flex items-center justify-between">
+                <CardContent className="p-3 md:p-6 pt-0">
+                  <div className="text-base md:text-2xl font-bold truncate">{stat.value}</div>
+                  <div className="flex items-center justify-between mt-1">
                     <p className="text-xs text-muted-foreground truncate">
                       {stat.description}
                     </p>
-                    <span className="text-xs text-green-600 font-medium flex-shrink-0">
+                    <span className="text-xs text-green-600 font-medium flex-shrink-0 ml-1">
                       {stat.change}
                     </span>
                   </div>
@@ -188,33 +188,38 @@ const Analytics = () => {
           </div>
 
           {/* Charts Section - Responsive Layout */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 md:gap-6">
             {/* Sales Chart */}
-            <Card className="xl:col-span-2">
-              <CardHeader>
-                <CardTitle className="text-lg md:text-xl">Trend Penjualan - {getPeriodTitle(dateRange)}</CardTitle>
-                <CardDescription className="text-sm">
+            <Card className="xl:col-span-2 min-w-0">
+              <CardHeader className="p-3 md:p-6">
+                <CardTitle className="text-base md:text-xl">Trend Penjualan - {getPeriodTitle(dateRange)}</CardTitle>
+                <CardDescription className="text-xs md:text-sm">
                   Penjualan untuk periode {getPeriodTitle(dateRange).toLowerCase()}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-64 md:h-80">
+              <CardContent className="p-3 md:p-6 pt-0">
+                <div className="h-48 md:h-80 min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={salesData}>
+                    <BarChart data={salesData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="name" 
-                        fontSize={12}
-                        tick={{ fontSize: 10 }}
+                        fontSize={10}
+                        tick={{ fontSize: 8 }}
+                        interval={0}
+                        angle={-45}
+                        textAnchor="end"
+                        height={60}
                       />
                       <YAxis 
-                        fontSize={12}
-                        tick={{ fontSize: 10 }}
+                        fontSize={10}
+                        tick={{ fontSize: 8 }}
+                        tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
                       />
                       <Tooltip 
                         formatter={(value) => [`Rp ${value.toLocaleString('id-ID')}`, 'Penjualan']}
-                        labelStyle={{ fontSize: '12px' }}
-                        contentStyle={{ fontSize: '12px' }}
+                        labelStyle={{ fontSize: '10px' }}
+                        contentStyle={{ fontSize: '10px' }}
                       />
                       <Bar dataKey="sales" fill="#3b82f6" />
                     </BarChart>
@@ -224,13 +229,13 @@ const Analytics = () => {
             </Card>
 
             {/* Category Distribution */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg md:text-xl">Distribusi Kategori</CardTitle>
-                <CardDescription className="text-sm">Penjualan berdasarkan kategori produk</CardDescription>
+            <Card className="min-w-0">
+              <CardHeader className="p-3 md:p-6">
+                <CardTitle className="text-base md:text-xl">Distribusi Kategori</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Penjualan berdasarkan kategori produk</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-64 md:h-80">
+              <CardContent className="p-3 md:p-6 pt-0">
+                <div className="h-48 md:h-80 min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -239,7 +244,7 @@ const Analytics = () => {
                         cy="50%"
                         labelLine={false}
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={80}
+                        outerRadius={60}
                         fill="#8884d8"
                         dataKey="value"
                       >
@@ -247,7 +252,7 @@ const Analytics = () => {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={{ fontSize: '10px' }} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -255,28 +260,28 @@ const Analytics = () => {
             </Card>
 
             {/* Stock Movement */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg md:text-xl">Pergerakan Stok</CardTitle>
-                <CardDescription className="text-sm">Stok masuk vs stok keluar per minggu</CardDescription>
+            <Card className="min-w-0">
+              <CardHeader className="p-3 md:p-6">
+                <CardTitle className="text-base md:text-xl">Pergerakan Stok</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Stok masuk vs stok keluar per minggu</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-64 md:h-80">
+              <CardContent className="p-3 md:p-6 pt-0">
+                <div className="h-48 md:h-80 min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={stockMovement}>
+                    <LineChart data={stockMovement} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="name" 
-                        fontSize={12}
-                        tick={{ fontSize: 10 }}
+                        fontSize={10}
+                        tick={{ fontSize: 8 }}
                       />
                       <YAxis 
-                        fontSize={12}
-                        tick={{ fontSize: 10 }}
+                        fontSize={10}
+                        tick={{ fontSize: 8 }}
                       />
                       <Tooltip 
-                        labelStyle={{ fontSize: '12px' }}
-                        contentStyle={{ fontSize: '12px' }}
+                        labelStyle={{ fontSize: '10px' }}
+                        contentStyle={{ fontSize: '10px' }}
                       />
                       <Line type="monotone" dataKey="stockIn" stroke="#00C49F" name="Stok Masuk" strokeWidth={2} />
                       <Line type="monotone" dataKey="stockOut" stroke="#FF8042" name="Stok Keluar" strokeWidth={2} />
@@ -294,28 +299,28 @@ const Analytics = () => {
           />
 
           {/* Lower Section - Responsive Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6">
             {/* Top Products */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg md:text-xl">Produk Terlaris - {getPeriodTitle(dateRange)}</CardTitle>
-                <CardDescription className="text-sm">5 produk dengan penjualan tertinggi untuk periode ini</CardDescription>
+            <Card className="min-w-0">
+              <CardHeader className="p-3 md:p-6">
+                <CardTitle className="text-base md:text-xl">Produk Terlaris - {getPeriodTitle(dateRange)}</CardTitle>
+                <CardDescription className="text-xs md:text-sm">5 produk dengan penjualan tertinggi untuk periode ini</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3 md:space-y-4">
+              <CardContent className="p-3 md:p-6 pt-0">
+                <div className="space-y-2 md:space-y-4">
                   {topProducts.map((product, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 md:p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
-                        <div className="w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                    <div key={index} className="flex items-center justify-between p-2 md:p-4 bg-gray-50 rounded-lg min-w-0">
+                      <div className="flex items-center space-x-2 md:space-x-4 min-w-0 flex-1">
+                        <div className="w-5 h-5 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
                           {index + 1}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm md:text-base truncate">{product.name}</p>
-                          <p className="text-xs md:text-sm text-muted-foreground">{product.sold} unit terjual</p>
+                          <p className="font-medium text-xs md:text-base truncate">{product.name}</p>
+                          <p className="text-xs text-muted-foreground">{product.sold} unit terjual</p>
                         </div>
                       </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-sm md:text-base">Rp {product.revenue.toLocaleString('id-ID')}</p>
+                      <div className="text-right flex-shrink-0 ml-2">
+                        <p className="font-bold text-xs md:text-base">Rp {product.revenue.toLocaleString('id-ID')}</p>
                         <p className="text-xs text-muted-foreground">Revenue</p>
                       </div>
                     </div>
@@ -325,30 +330,30 @@ const Analytics = () => {
             </Card>
 
             {/* Category Performance */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg md:text-xl">Performa Kategori</CardTitle>
-                <CardDescription className="text-sm">Detail penjualan per kategori</CardDescription>
+            <Card className="min-w-0">
+              <CardHeader className="p-3 md:p-6">
+                <CardTitle className="text-base md:text-xl">Performa Kategori</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Detail penjualan per kategori</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3 md:space-y-4">
+              <CardContent className="p-3 md:p-6 pt-0">
+                <div className="space-y-2 md:space-y-4">
                   {categoryData.map((category, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 md:p-4 border rounded-lg">
-                      <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
+                    <div key={index} className="flex items-center justify-between p-2 md:p-4 border rounded-lg min-w-0">
+                      <div className="flex items-center space-x-2 md:space-x-4 min-w-0 flex-1">
                         <div
-                          className="w-3 h-3 md:w-4 md:h-4 rounded-full flex-shrink-0"
+                          className="w-2 h-2 md:w-4 md:h-4 rounded-full flex-shrink-0"
                           style={{ backgroundColor: COLORS[index % COLORS.length] }}
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm md:text-base truncate">{category.name}</p>
-                          <p className="text-xs md:text-sm text-muted-foreground">{category.value}% dari total penjualan</p>
+                          <p className="font-medium text-xs md:text-base truncate">{category.name}</p>
+                          <p className="text-xs text-muted-foreground">{category.value}% dari total penjualan</p>
                         </div>
                       </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-sm md:text-base">Rp {category.sales.toLocaleString('id-ID')}</p>
-                        <div className="w-16 md:w-24 bg-gray-200 rounded-full h-2 mt-1">
+                      <div className="text-right flex-shrink-0 ml-2">
+                        <p className="font-bold text-xs md:text-base">Rp {category.sales.toLocaleString('id-ID')}</p>
+                        <div className="w-12 md:w-24 bg-gray-200 rounded-full h-1.5 md:h-2 mt-1">
                           <div
-                            className="bg-primary h-2 rounded-full transition-all"
+                            className="bg-primary h-1.5 md:h-2 rounded-full transition-all"
                             style={{ width: `${category.value}%` }}
                           />
                         </div>
