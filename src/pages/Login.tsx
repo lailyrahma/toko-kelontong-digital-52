@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
@@ -179,7 +178,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setCurrentView('forgot')}
-                    className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     Forgot your password?
                   </button>
@@ -187,7 +186,7 @@ const Login = () => {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium" 
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium" 
                   disabled={loading}
                 >
                   {loading ? 'SIGNING IN...' : 'SIGN IN'}
@@ -199,7 +198,7 @@ const Login = () => {
                   Don't have an account?{' '}
                   <button
                     onClick={() => setCurrentView('signup')}
-                    className="text-teal-600 hover:text-teal-700 font-medium"
+                    className="text-blue-600 hover:text-blue-700 font-medium"
                   >
                     Sign up here
                   </button>
@@ -207,9 +206,9 @@ const Login = () => {
               </div>
 
               {/* Demo Credentials */}
-              <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-medium text-sm mb-2 text-gray-700">Demo Login:</h4>
-                <div className="text-xs space-y-1 text-gray-600">
+              <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-sm mb-2 text-blue-800">Demo Login:</h4>
+                <div className="text-xs space-y-1 text-blue-700">
                   <p><strong>Kasir:</strong> kasir@toko.com / kasir123</p>
                   <p><strong>Pemilik:</strong> pemilik@toko.com / pemilik123</p>
                 </div>
@@ -271,7 +270,7 @@ const Login = () => {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium" 
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium" 
                   disabled={signUpLoading}
                 >
                   {signUpLoading ? 'CREATING ACCOUNT...' : 'SIGN UP'}
@@ -303,7 +302,7 @@ const Login = () => {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium" 
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium" 
                   disabled={forgotLoading}
                 >
                   {forgotLoading ? 'SENDING...' : 'SEND RESET LINK'}
@@ -315,18 +314,18 @@ const Login = () => {
       </div>
 
       {/* Right Panel - Welcome Message */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-teal-500 to-teal-600 items-center justify-center p-8">
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-500 to-blue-600 items-center justify-center p-8">
         <div className="text-center text-white max-w-md">
           {currentView === 'login' && (
             <>
               <h2 className="text-4xl font-bold mb-4">Hello, Friend!</h2>
-              <p className="text-teal-100 mb-8 text-lg">
+              <p className="text-blue-100 mb-8 text-lg">
                 Enter your personal details and start journey with us
               </p>
               <Button
                 variant="outline"
                 onClick={() => setCurrentView('signup')}
-                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-teal-600 px-8 py-3 rounded-full font-medium"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-full font-medium"
               >
                 SIGN UP
               </Button>
@@ -336,13 +335,13 @@ const Login = () => {
           {currentView === 'signup' && (
             <>
               <h2 className="text-4xl font-bold mb-4">Welcome Back!</h2>
-              <p className="text-teal-100 mb-8 text-lg">
+              <p className="text-blue-100 mb-8 text-lg">
                 To keep connected with us please login with your personal info
               </p>
               <Button
                 variant="outline"
                 onClick={() => setCurrentView('login')}
-                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-teal-600 px-8 py-3 rounded-full font-medium"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-full font-medium"
               >
                 SIGN IN
               </Button>
@@ -352,7 +351,7 @@ const Login = () => {
           {currentView === 'forgot' && (
             <>
               <h2 className="text-4xl font-bold mb-4">Need Help?</h2>
-              <p className="text-teal-100 text-lg">
+              <p className="text-blue-100 text-lg">
                 Don't worry, we'll help you reset your password quickly and securely
               </p>
             </>

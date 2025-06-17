@@ -211,21 +211,6 @@ const Transaction = () => {
             <Button variant="outline" className="scan-animation sm:hidden" size="sm">
               <Scan className="h-4 w-4" />
             </Button>
-            {/* Mobile Cart Toggle - Enhanced */}
-            <Button 
-              variant="default" 
-              size="sm"
-              className="lg:hidden relative bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg border-2 border-blue-300 px-4"
-              onClick={() => setShowMobileCart(true)}
-            >
-              <ShoppingCart className="h-4 w-4 mr-1" />
-              <span className="font-semibold">Cart</span>
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-md animate-pulse">
-                  {totalItems}
-                </span>
-              )}
-            </Button>
           </div>
         </header>
 
@@ -258,32 +243,30 @@ const Transaction = () => {
 
               <ResizableHandle withHandle />
 
-              {/* Cart Panel - Enhanced */}
+              {/* Desktop Cart Panel - Simplified */}
               <ResizablePanel defaultSize={35} minSize={25} maxSize={50}>
-                <div className="h-full bg-gradient-to-b from-blue-50 to-white border-l-2 border-blue-200 shadow-lg">
-                  <div className="p-6 bg-blue-100 border-b-2 border-blue-200">
+                <div className="h-full bg-white border-l">
+                  <div className="p-4 border-b bg-blue-50">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-bold flex items-center text-blue-900">
-                        <ShoppingCart className="mr-2 h-6 w-6 text-blue-600" />
+                      <h2 className="text-lg font-semibold flex items-center text-blue-900">
+                        <ShoppingCart className="mr-2 h-5 w-5" />
                         Keranjang ({totalItems})
                       </h2>
                       {cartItems.length > 0 && (
-                        <Button variant="ghost" size="sm" onClick={clearCart} className="text-red-600 hover:text-red-800 hover:bg-red-50">
+                        <Button variant="ghost" size="sm" onClick={clearCart} className="text-red-600 hover:text-red-800">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex-1 p-6">
-                    <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                  <div className="flex-1 p-4">
+                    <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
                       {cartItems.length === 0 ? (
-                        <div className="text-center py-12">
-                          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                            <ShoppingCart className="h-8 w-8 text-gray-400" />
-                          </div>
-                          <p className="text-gray-500 font-medium">Keranjang kosong</p>
-                          <p className="text-sm text-gray-400 mt-1">Tambahkan produk untuk memulai transaksi</p>
+                        <div className="text-center py-8">
+                          <ShoppingCart className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                          <p className="text-gray-500">Keranjang kosong</p>
+                          <p className="text-sm text-gray-400">Tambahkan produk untuk memulai</p>
                         </div>
                       ) : (
                         cartItems.map((item) => (
@@ -299,7 +282,7 @@ const Transaction = () => {
 
                     <Separator className="my-4" />
                     
-                    <div className="space-y-3 mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <div className="bg-blue-50 p-3 rounded-lg mb-4">
                       <div className="flex justify-between text-lg font-bold text-blue-900">
                         <span>Total:</span>
                         <span>Rp {totalAmount.toLocaleString('id-ID')}</span>
@@ -308,11 +291,10 @@ const Transaction = () => {
 
                     <Button 
                       onClick={handlePayment} 
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200" 
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3" 
                       size="lg"
                       disabled={cartItems.length === 0}
                     >
-                      <ShoppingCart className="mr-2 h-5 w-5" />
                       Bayar Sekarang
                     </Button>
                   </div>
@@ -342,56 +324,39 @@ const Transaction = () => {
             </div>
           </div>
 
-          {/* Mobile Cart Bottom Bar - Enhanced */}
-          <div className="lg:hidden bg-white border-t-4 border-blue-500 p-4 sticky bottom-0 shadow-2xl z-10">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-4 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="text-white">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <ShoppingCart className="h-5 w-5" />
-                    <p className="text-sm font-medium opacity-90">{totalItems} item dalam keranjang</p>
-                  </div>
-                  <p className="font-bold text-xl">Rp {totalAmount.toLocaleString('id-ID')}</p>
-                </div>
-                <div className="flex space-x-2">
-                  <Button 
-                    onClick={() => setShowMobileCart(true)}
-                    variant="outline"
-                    className="bg-white bg-opacity-20 border-white border-opacity-30 text-white hover:bg-white hover:bg-opacity-30 backdrop-blur-sm px-4"
-                    disabled={cartItems.length === 0}
-                  >
-                    Lihat
-                  </Button>
-                  <Button 
-                    onClick={handlePayment} 
-                    disabled={cartItems.length === 0}
-                    className="px-6 bg-white text-blue-600 hover:bg-gray-100 font-bold shadow-md border-2 border-white"
-                  >
-                    Bayar
-                  </Button>
-                </div>
-              </div>
-              {cartItems.length === 0 && (
-                <div className="mt-2 text-center">
-                  <p className="text-white text-opacity-80 text-sm">Tambahkan produk untuk memulai transaksi</p>
-                </div>
+          {/* Mobile Cart Button - Simplified and More Prominent */}
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-10">
+            <Button 
+              onClick={() => setShowMobileCart(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 text-lg relative shadow-lg"
+              size="lg"
+            >
+              <ShoppingCart className="h-6 w-6 mr-3" />
+              Lihat Keranjang ({totalItems})
+              {totalItems > 0 && (
+                <>
+                  <span className="ml-auto">Rp {totalAmount.toLocaleString('id-ID')}</span>
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full h-6 w-6 flex items-center justify-center font-bold animate-pulse">
+                    {totalItems}
+                  </span>
+                </>
               )}
-            </div>
+            </Button>
           </div>
         </div>
 
-        {/* Mobile Cart Overlay - Enhanced */}
+        {/* Mobile Cart Overlay - Simplified */}
         {showMobileCart && (
           <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-            <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-gradient-to-b from-blue-50 to-white shadow-2xl">
-              <div className="flex items-center justify-between p-4 border-b-2 border-blue-200 bg-gradient-to-r from-blue-500 to-blue-600">
-                <h2 className="text-lg font-bold flex items-center text-white">
+            <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-white shadow-xl">
+              <div className="flex items-center justify-between p-4 border-b bg-blue-50">
+                <h2 className="text-lg font-semibold flex items-center text-blue-900">
                   <ShoppingCart className="mr-2 h-5 w-5" />
                   Keranjang ({totalItems})
                 </h2>
                 <div className="flex items-center space-x-2">
                   {cartItems.length > 0 && (
-                    <Button variant="ghost" size="sm" onClick={clearCart} className="text-white hover:bg-white hover:bg-opacity-20">
+                    <Button variant="ghost" size="sm" onClick={clearCart} className="text-red-600">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   )}
@@ -399,22 +364,20 @@ const Transaction = () => {
                     variant="ghost" 
                     size="sm" 
                     onClick={() => setShowMobileCart(false)}
-                    className="text-white hover:bg-white hover:bg-opacity-20"
+                    className="text-gray-600"
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
 
-              <div className="flex-1 overflow-hidden flex flex-col">
-                <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+              <div className="flex-1 overflow-hidden flex flex-col h-full">
+                <div className="flex-1 p-4 space-y-3 overflow-y-auto">
                   {cartItems.length === 0 ? (
                     <div className="text-center py-12">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                        <ShoppingCart className="h-8 w-8 text-blue-400" />
-                      </div>
+                      <ShoppingCart className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                       <p className="text-gray-500 font-medium">Keranjang kosong</p>
-                      <p className="text-sm text-gray-400 mt-1">Tambahkan produk untuk memulai</p>
+                      <p className="text-sm text-gray-400">Tambahkan produk untuk memulai</p>
                     </div>
                   ) : (
                     cartItems.map((item) => (
@@ -429,20 +392,21 @@ const Transaction = () => {
                 </div>
 
                 {cartItems.length > 0 && (
-                  <div className="border-t-2 border-blue-200 p-4 bg-gradient-to-r from-blue-50 to-blue-100">
-                    <div className="flex justify-between text-xl font-bold mb-4 text-blue-900">
-                      <span>Total:</span>
-                      <span>Rp {totalAmount.toLocaleString('id-ID')}</span>
+                  <div className="border-t p-4 bg-white">
+                    <div className="bg-blue-50 p-3 rounded-lg mb-4">
+                      <div className="flex justify-between text-xl font-bold text-blue-900">
+                        <span>Total:</span>
+                        <span>Rp {totalAmount.toLocaleString('id-ID')}</span>
+                      </div>
                     </div>
                     <Button 
                       onClick={() => {
                         setShowMobileCart(false);
                         handlePayment();
                       }} 
-                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-lg py-3 text-lg" 
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 text-lg shadow-lg" 
                       size="lg"
                     >
-                      <ShoppingCart className="mr-2 h-5 w-5" />
                       Bayar Sekarang
                     </Button>
                   </div>
