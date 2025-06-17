@@ -4,12 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 
 const Login = () => {
+  const [currentView, setCurrentView] = useState<'login' | 'signup' | 'forgot'>('login');
+  const [showPassword, setShowPassword] = useState(false);
+  
   // Login states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -74,6 +77,7 @@ const Login = () => {
       setSignUpName('');
       setSignUpEmail('');
       setSignUpPassword('');
+      setCurrentView('login');
     } catch (error) {
       toast({
         title: "Error",
@@ -98,6 +102,7 @@ const Login = () => {
       });
       
       setForgotEmail('');
+      setCurrentView('login');
     } catch (error) {
       toast({
         title: "Error",
@@ -110,133 +115,250 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-xl font-bold text-white">TB</span>
-          </div>
-          <div>
-            <CardTitle className="text-xl font-bold text-primary">Toko Barokah</CardTitle>
-            <CardDescription className="text-sm">Sistem Point of Sale</CardDescription>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="p-6">
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="login" className="text-xs">Masuk</TabsTrigger>
-              <TabsTrigger value="signup" className="text-xs">Daftar</TabsTrigger>
-              <TabsTrigger value="forgot" className="text-xs">Lupa Password</TabsTrigger>
-            </TabsList>
-            
-            {/* Login Tab */}
-            <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
+    <div className="min-h-screen flex">
+      {/* Left Panel - Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-md">
+          {/* Back Button for Sign Up and Forgot Password */}
+          {currentView !== 'login' && (
+            <Button
+              variant="ghost"
+              onClick={() => setCurrentView('login')}
+              className="mb-4 p-0 h-auto text-gray-600 hover:text-gray-800"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali
+            </Button>
+          )}
+
+          {/* Login Form */}
+          {currentView === 'login' && (
+            <>
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign in to Toko Barokah</h1>
+                <p className="text-gray-600">or use your email account</p>
+              </div>
+
+              <form onSubmit={handleLogin} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email" className="text-sm">Email</Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    placeholder="masukkan@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Input
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10 h-12 border-gray-300 rounded-lg"
+                      required
+                    />
+                  </div>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="login-password" className="text-sm">Password</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="masukkan password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10 h-12 border-gray-300 rounded-lg"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Masuk...' : 'Masuk'}
+
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentView('forgot')}
+                    className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium" 
+                  disabled={loading}
+                >
+                  {loading ? 'SIGNING IN...' : 'SIGN IN'}
                 </Button>
               </form>
-            </TabsContent>
-            
-            {/* Sign Up Tab */}
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name" className="text-sm">Nama Lengkap</Label>
+
+              <div className="mt-8 text-center">
+                <p className="text-gray-600">
+                  Don't have an account?{' '}
+                  <button
+                    onClick={() => setCurrentView('signup')}
+                    className="text-teal-600 hover:text-teal-700 font-medium"
+                  >
+                    Sign up here
+                  </button>
+                </p>
+              </div>
+
+              {/* Demo Credentials */}
+              <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-medium text-sm mb-2 text-gray-700">Demo Login:</h4>
+                <div className="text-xs space-y-1 text-gray-600">
+                  <p><strong>Kasir:</strong> kasir@toko.com / kasir123</p>
+                  <p><strong>Pemilik:</strong> pemilik@toko.com / pemilik123</p>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Sign Up Form */}
+          {currentView === 'signup' && (
+            <>
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
+                <p className="text-gray-600">Enter your personal details and start journey with us</p>
+              </div>
+
+              <form onSubmit={handleSignUp} className="space-y-6">
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
-                    id="signup-name"
                     type="text"
-                    placeholder="nama lengkap"
+                    placeholder="Full Name"
                     value={signUpName}
                     onChange={(e) => setSignUpName(e.target.value)}
+                    className="pl-10 h-12 border-gray-300 rounded-lg"
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-sm">Email</Label>
+
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
-                    id="signup-email"
                     type="email"
-                    placeholder="email@domain.com"
+                    placeholder="Email"
                     value={signUpEmail}
                     onChange={(e) => setSignUpEmail(e.target.value)}
+                    className="pl-10 h-12 border-gray-300 rounded-lg"
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-sm">Password</Label>
+
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="buat password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
                     value={signUpPassword}
                     onChange={(e) => setSignUpPassword(e.target.value)}
+                    className="pl-10 pr-10 h-12 border-gray-300 rounded-lg"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
                 </div>
-                <Button type="submit" className="w-full" disabled={signUpLoading}>
-                  {signUpLoading ? 'Mendaftar...' : 'Daftar Sekarang'}
+
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium" 
+                  disabled={signUpLoading}
+                >
+                  {signUpLoading ? 'CREATING ACCOUNT...' : 'SIGN UP'}
                 </Button>
               </form>
-            </TabsContent>
-            
-            {/* Forgot Password Tab */}
-            <TabsContent value="forgot">
-              <form onSubmit={handleForgotPassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="forgot-email" className="text-sm">Email</Label>
+            </>
+          )}
+
+          {/* Forgot Password Form */}
+          {currentView === 'forgot' && (
+            <>
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h1>
+                <p className="text-gray-600">Enter your email to receive reset instructions</p>
+              </div>
+
+              <form onSubmit={handleForgotPassword} className="space-y-6">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
-                    id="forgot-email"
                     type="email"
-                    placeholder="masukkan email anda"
+                    placeholder="Enter your email"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
+                    className="pl-10 h-12 border-gray-300 rounded-lg"
                     required
                   />
                 </div>
-                <div className="text-xs text-muted-foreground mb-4">
-                  Kami akan mengirim link reset password ke email Anda
-                </div>
-                <Button type="submit" className="w-full" disabled={forgotLoading}>
-                  {forgotLoading ? 'Mengirim...' : 'Kirim Link Reset'}
+
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium" 
+                  disabled={forgotLoading}
+                >
+                  {forgotLoading ? 'SENDING...' : 'SEND RESET LINK'}
                 </Button>
               </form>
-            </TabsContent>
-          </Tabs>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Right Panel - Welcome Message */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-teal-500 to-teal-600 items-center justify-center p-8">
+        <div className="text-center text-white max-w-md">
+          {currentView === 'login' && (
+            <>
+              <h2 className="text-4xl font-bold mb-4">Hello, Friend!</h2>
+              <p className="text-teal-100 mb-8 text-lg">
+                Enter your personal details and start journey with us
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => setCurrentView('signup')}
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-teal-600 px-8 py-3 rounded-full font-medium"
+              >
+                SIGN UP
+              </Button>
+            </>
+          )}
           
-          {/* Demo Credentials */}
-          <div className="mt-6 p-3 bg-muted rounded-lg">
-            <h4 className="font-medium text-sm mb-2">Demo Login:</h4>
-            <div className="text-xs space-y-1">
-              <p><strong>Kasir:</strong> kasir@toko.com / kasir123</p>
-              <p><strong>Pemilik:</strong> pemilik@toko.com / pemilik123</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          {currentView === 'signup' && (
+            <>
+              <h2 className="text-4xl font-bold mb-4">Welcome Back!</h2>
+              <p className="text-teal-100 mb-8 text-lg">
+                To keep connected with us please login with your personal info
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => setCurrentView('login')}
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-teal-600 px-8 py-3 rounded-full font-medium"
+              >
+                SIGN IN
+              </Button>
+            </>
+          )}
+
+          {currentView === 'forgot' && (
+            <>
+              <h2 className="text-4xl font-bold mb-4">Need Help?</h2>
+              <p className="text-teal-100 text-lg">
+                Don't worry, we'll help you reset your password quickly and securely
+              </p>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
