@@ -7,11 +7,22 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const { login } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,6 +54,32 @@ const Login = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotPasswordLoading(true);
+
+    try {
+      // Simulasi reset password - dalam implementasi nyata, ini akan mengirim email reset
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Email Reset Terkirim",
+        description: `Link reset password telah dikirim ke ${forgotPasswordEmail}`,
+      });
+      
+      setForgotPasswordOpen(false);
+      setForgotPasswordEmail('');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal mengirim email reset password",
+        variant: "destructive",
+      });
+    } finally {
+      setForgotPasswordLoading(false);
     }
   };
 
@@ -80,6 +117,45 @@ const Login = () => {
                 required
               />
             </div>
+            
+            <div className="flex justify-end">
+              <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="link" className="text-sm p-0 h-auto">
+                    Lupa kata sandi?
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Reset Password</DialogTitle>
+                    <DialogDescription>
+                      Masukkan email Anda untuk menerima link reset password.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleForgotPassword} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="forgot-email">Email</Label>
+                      <Input
+                        id="forgot-email"
+                        type="email"
+                        placeholder="Masukkan email Anda"
+                        value={forgotPasswordEmail}
+                        onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={forgotPasswordLoading}
+                    >
+                      {forgotPasswordLoading ? 'Mengirim...' : 'Kirim Link Reset'}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Masuk...' : 'Masuk'}
             </Button>
