@@ -6,10 +6,12 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TrendingUp, ShoppingCart, Package, DollarSign } from 'lucide-react';
 import DateRangeFilter from '@/components/analytics/DateRangeFilter';
 import AnalyticsTransactionHistory from '@/components/analytics/AnalyticsTransactionHistory';
+import StatsDetailDialog from '@/components/analytics/StatsDetailDialog';
 
 const Analytics = () => {
   const [dateRange, setDateRange] = useState('today');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedStat, setSelectedStat] = useState<{type: string, title: string, data: any} | null>(null);
 
   // Sample data yang berubah berdasarkan filter
   const getSalesData = (range: string) => {
@@ -101,28 +103,32 @@ const Analytics = () => {
         value: `Rp ${(baseSales * multiplier / 1000000).toFixed(1)} Juta`,
         change: '+12.5%',
         icon: DollarSign,
-        description: period === 'today' ? 'Hari ini' : period === 'week' ? 'Minggu ini' : period === 'month' ? 'Bulan ini' : 'Tahun ini'
+        description: period === 'today' ? 'Hari ini' : period === 'week' ? 'Minggu ini' : period === 'month' ? 'Bulan ini' : 'Tahun ini',
+        type: 'sales'
       },
       {
         title: 'Total Transaksi',
         value: Math.round(baseTransactions * multiplier).toLocaleString(),
         change: '+8.2%',
         icon: ShoppingCart,
-        description: period === 'today' ? 'Hari ini' : period === 'week' ? 'Minggu ini' : period === 'month' ? 'Bulan ini' : 'Tahun ini'
+        description: period === 'today' ? 'Hari ini' : period === 'week' ? 'Minggu ini' : period === 'month' ? 'Bulan ini' : 'Tahun ini',
+        type: 'transactions'
       },
       {
         title: 'Produk Terjual',
         value: Math.round(baseProducts * multiplier).toLocaleString(),
         change: '+15.3%',
         icon: Package,
-        description: 'Unit terjual'
+        description: 'Unit terjual',
+        type: 'products'
       },
       {
         title: 'Rata-rata per Transaksi',
         value: `Rp ${baseAverage.toLocaleString()}`,
         change: '+4.1%',
         icon: TrendingUp,
-        description: 'Per transaksi'
+        description: 'Per transaksi',
+        type: 'average'
       }
     ];
   };
@@ -140,6 +146,14 @@ const Analytics = () => {
       case 'custom': return 'Custom';
       default: return 'Periode Dipilih';
     }
+  };
+
+  const handleStatClick = (stat: any) => {
+    setSelectedStat({
+      type: stat.type,
+      title: stat.title,
+      data: stat
+    });
   };
 
   return (
@@ -162,10 +176,14 @@ const Analytics = () => {
             onDateChange={setSelectedDate}
           />
 
-          {/* Stats Overview - Responsive Grid */}
+          {/* Stats Overview - Now Clickable */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
             {stats.map((stat, index) => (
-              <Card key={index} className="min-w-0">
+              <Card 
+                key={index} 
+                className="min-w-0 cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => handleStatClick(stat)}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-6">
                   <CardTitle className="text-xs md:text-sm font-medium truncate pr-2">
                     {stat.title}
@@ -366,6 +384,15 @@ const Analytics = () => {
           </div>
         </main>
       </div>
+
+      {/* Stats Detail Dialog */}
+      <StatsDetailDialog
+        isOpen={!!selectedStat}
+        onClose={() => setSelectedStat(null)}
+        title={selectedStat?.title || ''}
+        data={selectedStat?.data}
+        type={selectedStat?.type as any}
+      />
     </>
   );
 };

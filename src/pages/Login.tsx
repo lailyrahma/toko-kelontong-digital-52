@@ -8,14 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 
 const Login = () => {
   // Login states
@@ -27,14 +19,11 @@ const Login = () => {
   const [signUpName, setSignUpName] = useState('');
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
-  const [signUpPhone, setSignUpPhone] = useState('');
-  const [signUpAddress, setSignUpAddress] = useState('');
   const [signUpLoading, setSignUpLoading] = useState(false);
   
   // Forgot password states
-  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
-  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
-  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
   
   const { login } = useUser();
   const navigate = useNavigate();
@@ -75,20 +64,16 @@ const Login = () => {
     setSignUpLoading(true);
 
     try {
-      // Simulasi registrasi - dalam implementasi nyata, ini akan memanggil API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({
         title: "Registrasi Berhasil",
-        description: "Akun Anda telah dibuat. Silakan login dengan akun baru Anda.",
+        description: "Akun berhasil dibuat. Silakan login.",
       });
       
-      // Reset form
       setSignUpName('');
       setSignUpEmail('');
       setSignUpPassword('');
-      setSignUpPhone('');
-      setSignUpAddress('');
     } catch (error) {
       toast({
         title: "Error",
@@ -102,184 +87,150 @@ const Login = () => {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setForgotPasswordLoading(true);
+    setForgotLoading(true);
 
     try {
-      // Simulasi reset password - dalam implementasi nyata, ini akan mengirim email reset
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({
-        title: "Email Reset Terkirim",
-        description: `Link reset password telah dikirim ke ${forgotPasswordEmail}`,
+        title: "Email Terkirim",
+        description: `Link reset password telah dikirim ke ${forgotEmail}`,
       });
       
-      setForgotPasswordOpen(false);
-      setForgotPasswordEmail('');
+      setForgotEmail('');
     } catch (error) {
       toast({
         title: "Error",
-        description: "Gagal mengirim email reset password",
+        description: "Gagal mengirim email reset",
         variant: "destructive",
       });
     } finally {
-      setForgotPasswordLoading(false);
+      setForgotLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-4">
-            <span className="text-2xl font-bold text-white">TB</span>
+        <CardHeader className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+            <span className="text-xl font-bold text-white">TB</span>
           </div>
-          <CardTitle className="text-2xl font-bold text-primary">Toko Barokah</CardTitle>
-          <CardDescription>Sistem Point of Sale</CardDescription>
+          <div>
+            <CardTitle className="text-xl font-bold text-primary">Toko Barokah</CardTitle>
+            <CardDescription className="text-sm">Sistem Point of Sale</CardDescription>
+          </div>
         </CardHeader>
-        <CardContent>
+        
+        <CardContent className="p-6">
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Masuk</TabsTrigger>
-              <TabsTrigger value="signup">Daftar</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="login" className="text-xs">Masuk</TabsTrigger>
+              <TabsTrigger value="signup" className="text-xs">Daftar</TabsTrigger>
+              <TabsTrigger value="forgot" className="text-xs">Lupa Password</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="login" className="space-y-4">
+            {/* Login Tab */}
+            <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="login-email" className="text-sm">Email</Label>
                   <Input
-                    id="email"
+                    id="login-email"
                     type="email"
-                    placeholder="Masukkan email Anda"
+                    placeholder="masukkan@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="login-password" className="text-sm">Password</Label>
                   <Input
-                    id="password"
+                    id="login-password"
                     type="password"
-                    placeholder="Masukkan password Anda"
+                    placeholder="masukkan password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
-                
-                <div className="flex justify-end">
-                  <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="link" className="text-sm p-0 h-auto">
-                        Lupa kata sandi?
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Reset Password</DialogTitle>
-                        <DialogDescription>
-                          Masukkan email Anda untuk menerima link reset password.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <form onSubmit={handleForgotPassword} className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="forgot-email">Email</Label>
-                          <Input
-                            id="forgot-email"
-                            type="email"
-                            placeholder="Masukkan email Anda"
-                            value={forgotPasswordEmail}
-                            onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <Button 
-                          type="submit" 
-                          className="w-full" 
-                          disabled={forgotPasswordLoading}
-                        >
-                          {forgotPasswordLoading ? 'Mengirim...' : 'Kirim Link Reset'}
-                        </Button>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Masuk...' : 'Masuk'}
                 </Button>
               </form>
             </TabsContent>
             
-            <TabsContent value="signup" className="space-y-4">
+            {/* Sign Up Tab */}
+            <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Nama Lengkap</Label>
+                  <Label htmlFor="signup-name" className="text-sm">Nama Lengkap</Label>
                   <Input
                     id="signup-name"
                     type="text"
-                    placeholder="Masukkan nama lengkap"
+                    placeholder="nama lengkap"
                     value={signUpName}
                     onChange={(e) => setSignUpName(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email" className="text-sm">Email</Label>
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="Masukkan email Anda"
+                    placeholder="email@domain.com"
                     value={signUpEmail}
                     onChange={(e) => setSignUpEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password" className="text-sm">Password</Label>
                   <Input
                     id="signup-password"
                     type="password"
-                    placeholder="Masukkan password"
+                    placeholder="buat password"
                     value={signUpPassword}
                     onChange={(e) => setSignUpPassword(e.target.value)}
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-phone">No. Telepon</Label>
-                  <Input
-                    id="signup-phone"
-                    type="tel"
-                    placeholder="Masukkan nomor telepon"
-                    value={signUpPhone}
-                    onChange={(e) => setSignUpPhone(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-address">Alamat</Label>
-                  <Input
-                    id="signup-address"
-                    type="text"
-                    placeholder="Masukkan alamat"
-                    value={signUpAddress}
-                    onChange={(e) => setSignUpAddress(e.target.value)}
-                    required
-                  />
-                </div>
-
                 <Button type="submit" className="w-full" disabled={signUpLoading}>
-                  {signUpLoading ? 'Mendaftar...' : 'Daftar'}
+                  {signUpLoading ? 'Mendaftar...' : 'Daftar Sekarang'}
+                </Button>
+              </form>
+            </TabsContent>
+            
+            {/* Forgot Password Tab */}
+            <TabsContent value="forgot">
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="forgot-email" className="text-sm">Email</Label>
+                  <Input
+                    id="forgot-email"
+                    type="email"
+                    placeholder="masukkan email anda"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="text-xs text-muted-foreground mb-4">
+                  Kami akan mengirim link reset password ke email Anda
+                </div>
+                <Button type="submit" className="w-full" disabled={forgotLoading}>
+                  {forgotLoading ? 'Mengirim...' : 'Kirim Link Reset'}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
           
-          <div className="mt-6 p-4 bg-muted rounded-lg">
-            <h4 className="font-semibold mb-2">Demo Login:</h4>
-            <div className="text-sm space-y-1">
+          {/* Demo Credentials */}
+          <div className="mt-6 p-3 bg-muted rounded-lg">
+            <h4 className="font-medium text-sm mb-2">Demo Login:</h4>
+            <div className="text-xs space-y-1">
               <p><strong>Kasir:</strong> kasir@toko.com / kasir123</p>
               <p><strong>Pemilik:</strong> pemilik@toko.com / pemilik123</p>
             </div>

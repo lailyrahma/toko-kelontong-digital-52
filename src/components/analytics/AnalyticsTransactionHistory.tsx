@@ -147,68 +147,127 @@ const AnalyticsTransactionHistory = ({ dateRange, selectedDate }: AnalyticsTrans
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Riwayat Transaksi</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-base md:text-xl">Riwayat Transaksi</CardTitle>
+          <CardDescription className="text-xs md:text-sm">
             Daftar transaksi untuk periode yang dipilih ({filteredTransactions.length} transaksi)
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 md:p-6">
           {filteredTransactions.length === 0 ? (
             <div className="text-center py-8">
               <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">Tidak ada transaksi pada periode ini</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID Transaksi</TableHead>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Pelanggan</TableHead>
-                  <TableHead>Items</TableHead>
-                  <TableHead>Pembayaran</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Mobile View - Card Layout */}
+              <div className="md:hidden space-y-3">
                 {filteredTransactions.map((transaction) => (
-                  <TableRow key={transaction.id} className="hover:bg-gray-50">
-                    <TableCell className="font-medium">{transaction.id}</TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{transaction.date}</div>
-                        <div className="text-sm text-muted-foreground">{transaction.time}</div>
+                  <Card key={transaction.id} className="border-l-4 border-l-primary">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="font-medium text-sm">{transaction.id}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {transaction.date} • {transaction.time}
+                          </p>
+                          {transaction.customerName && (
+                            <p className="text-xs text-muted-foreground">
+                              {transaction.customerName}
+                            </p>
+                          )}
+                        </div>
+                        <Badge variant={getStatusColor(transaction.status)}>
+                          {transaction.status === 'completed' ? 'Selesai' : 
+                           transaction.status === 'pending' ? 'Pending' : 'Dibatalkan'}
+                        </Badge>
                       </div>
-                    </TableCell>
-                    <TableCell>{transaction.customerName || '-'}</TableCell>
-                    <TableCell>{transaction.items.length} item</TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1">
-                        <span>{getPaymentMethodIcon(transaction.paymentMethod)}</span>
-                        <span className="text-sm">
-                          {transaction.paymentMethod === 'cash' ? 'Tunai' : 
-                           transaction.paymentMethod === 'qris' ? 'QRIS' : 'Kartu Debit'}
-                        </span>
+                      
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center space-x-2">
+                          <span>{getPaymentMethodIcon(transaction.paymentMethod)}</span>
+                          <span className="text-xs">
+                            {transaction.paymentMethod === 'cash' ? 'Tunai' : 
+                             transaction.paymentMethod === 'qris' ? 'QRIS' : 'Kartu Debit'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {transaction.items.length} item
+                          </span>
+                        </div>
+                        <p className="font-bold text-sm">
+                          Rp {transaction.total.toLocaleString('id-ID')}
+                        </p>
                       </div>
-                    </TableCell>
-                    <TableCell className="font-bold">
-                      Rp {transaction.total.toLocaleString('id-ID')}
-                    </TableCell>
-                    <TableCell>
+                      
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => setSelectedTransaction(transaction)}
+                        className="w-full text-xs"
                       >
-                        <Eye className="h-4 w-4 mr-1" />
-                        Detail
+                        <Eye className="h-3 w-3 mr-1" />
+                        Lihat Detail
                       </Button>
-                    </TableCell>
-                  </TableRow>
+                    </CardContent>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+
+              {/* Desktop View - Table Layout */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">ID Transaksi</TableHead>
+                      <TableHead className="text-xs">Tanggal</TableHead>
+                      <TableHead className="text-xs">Pelanggan</TableHead>
+                      <TableHead className="text-xs">Items</TableHead>
+                      <TableHead className="text-xs">Pembayaran</TableHead>
+                      <TableHead className="text-xs">Total</TableHead>
+                      <TableHead className="text-xs">Aksi</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTransactions.map((transaction) => (
+                      <TableRow key={transaction.id} className="hover:bg-gray-50">
+                        <TableCell className="font-medium text-xs">{transaction.id}</TableCell>
+                        <TableCell className="text-xs">
+                          <div>
+                            <div className="font-medium">{transaction.date}</div>
+                            <div className="text-muted-foreground">{transaction.time}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs">{transaction.customerName || '-'}</TableCell>
+                        <TableCell className="text-xs">{transaction.items.length} item</TableCell>
+                        <TableCell className="text-xs">
+                          <div className="flex items-center space-x-1">
+                            <span>{getPaymentMethodIcon(transaction.paymentMethod)}</span>
+                            <span>
+                              {transaction.paymentMethod === 'cash' ? 'Tunai' : 
+                               transaction.paymentMethod === 'qris' ? 'QRIS' : 'Kartu Debit'}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-bold text-xs">
+                          Rp {transaction.total.toLocaleString('id-ID')}
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setSelectedTransaction(transaction)}
+                            className="text-xs"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            Detail
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -217,8 +276,8 @@ const AnalyticsTransactionHistory = ({ dateRange, selectedDate }: AnalyticsTrans
       <Dialog open={!!selectedTransaction} onOpenChange={() => setSelectedTransaction(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Detail Transaksi {selectedTransaction?.id}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base">Detail Transaksi {selectedTransaction?.id}</DialogTitle>
+            <DialogDescription className="text-xs">
               {selectedTransaction?.date} • {selectedTransaction?.time}
               {selectedTransaction?.customerName && ` • ${selectedTransaction.customerName}`}
             </DialogDescription>
@@ -226,23 +285,23 @@ const AnalyticsTransactionHistory = ({ dateRange, selectedDate }: AnalyticsTrans
           {selectedTransaction && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <h4 className="font-medium">Item yang dibeli:</h4>
+                <h4 className="font-medium text-sm">Item yang dibeli:</h4>
                 {selectedTransaction.items.map((item) => (
                   <div key={item.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{item.productName}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-xs truncate">{item.productName}</p>
                       <p className="text-xs text-muted-foreground">
                         {item.quantity} x Rp {item.price.toLocaleString('id-ID')}
                       </p>
                     </div>
-                    <span className="font-medium">
+                    <span className="font-medium text-xs ml-2">
                       Rp {item.subtotal.toLocaleString('id-ID')}
                     </span>
                   </div>
                 ))}
               </div>
               <div className="border-t pt-4 space-y-2">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center text-xs">
                   <span>Metode Pembayaran:</span>
                   <span className="flex items-center space-x-1">
                     <span>{getPaymentMethodIcon(selectedTransaction.paymentMethod)}</span>
@@ -252,14 +311,14 @@ const AnalyticsTransactionHistory = ({ dateRange, selectedDate }: AnalyticsTrans
                     </span>
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center text-xs">
                   <span>Status:</span>
                   <Badge variant={getStatusColor(selectedTransaction.status)}>
                     {selectedTransaction.status === 'completed' ? 'Selesai' : 
                      selectedTransaction.status === 'pending' ? 'Pending' : 'Dibatalkan'}
                   </Badge>
                 </div>
-                <div className="flex justify-between items-center font-bold text-lg border-t pt-2">
+                <div className="flex justify-between items-center font-bold text-sm border-t pt-2">
                   <span>Total:</span>
                   <span>Rp {selectedTransaction.total.toLocaleString('id-ID')}</span>
                 </div>
