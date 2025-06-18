@@ -304,7 +304,7 @@ const Transaction = () => {
           </div>
 
           {/* Mobile Product Selection */}
-          <div className="lg:hidden flex-1 p-4 md:p-6 pb-24">
+          <div className="lg:hidden flex-1 p-3 sm:p-4 md:p-6 pb-20 sm:pb-24">
             <ProductFilters
               searchTerm={searchTerm}
               selectedCategory={selectedCategory}
@@ -313,7 +313,7 @@ const Transaction = () => {
               onCategoryChange={setSelectedCategory}
             />
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
               {filteredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -324,19 +324,21 @@ const Transaction = () => {
             </div>
           </div>
 
-          {/* Mobile Cart Button - Simplified and More Prominent */}
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-10">
+          {/* Mobile Cart Button - Enhanced Responsiveness */}
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-3 sm:p-4 z-10">
             <Button 
               onClick={() => setShowMobileCart(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 text-lg relative shadow-lg"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 sm:py-4 text-sm sm:text-base md:text-lg relative shadow-lg flex items-center justify-between"
               size="lg"
             >
-              <ShoppingCart className="h-6 w-6 mr-3" />
-              Lihat Keranjang ({totalItems})
+              <div className="flex items-center">
+                <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6 mr-2 sm:mr-3" />
+                <span>Keranjang ({totalItems})</span>
+              </div>
               {totalItems > 0 && (
                 <>
-                  <span className="ml-auto">Rp {totalAmount.toLocaleString('id-ID')}</span>
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full h-6 w-6 flex items-center justify-center font-bold animate-pulse">
+                  <span className="text-sm sm:text-base">Rp {totalAmount.toLocaleString('id-ID')}</span>
+                  <span className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 bg-red-500 text-white text-xs sm:text-sm rounded-full h-5 w-5 sm:h-6 sm:w-6 flex items-center justify-center font-bold animate-pulse">
                     {totalItems}
                   </span>
                 </>
@@ -345,39 +347,39 @@ const Transaction = () => {
           </div>
         </div>
 
-        {/* Mobile Cart Overlay - Simplified */}
+        {/* Mobile Cart Overlay - Enhanced Responsiveness */}
         {showMobileCart && (
           <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
             <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-white shadow-xl">
-              <div className="flex items-center justify-between p-4 border-b bg-blue-50">
-                <h2 className="text-lg font-semibold flex items-center text-blue-900">
-                  <ShoppingCart className="mr-2 h-5 w-5" />
+              <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-blue-50">
+                <h2 className="text-base sm:text-lg font-semibold flex items-center text-blue-900">
+                  <ShoppingCart className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Keranjang ({totalItems})
                 </h2>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 sm:space-x-2">
                   {cartItems.length > 0 && (
-                    <Button variant="ghost" size="sm" onClick={clearCart} className="text-red-600">
-                      <Trash2 className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" onClick={clearCart} className="text-red-600 p-1 sm:p-2">
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   )}
                   <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={() => setShowMobileCart(false)}
-                    className="text-gray-600"
+                    className="text-gray-600 p-1 sm:p-2"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 </div>
               </div>
 
               <div className="flex-1 overflow-hidden flex flex-col h-full">
-                <div className="flex-1 p-4 space-y-3 overflow-y-auto">
+                <div className="flex-1 p-3 sm:p-4 space-y-2 sm:space-y-3 overflow-y-auto">
                   {cartItems.length === 0 ? (
-                    <div className="text-center py-12">
-                      <ShoppingCart className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                      <p className="text-gray-500 font-medium">Keranjang kosong</p>
-                      <p className="text-sm text-gray-400">Tambahkan produk untuk memulai</p>
+                    <div className="text-center py-8 sm:py-12">
+                      <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-3 sm:mb-4 text-gray-400" />
+                      <p className="text-sm sm:text-base text-gray-500 font-medium">Keranjang kosong</p>
+                      <p className="text-xs sm:text-sm text-gray-400">Tambahkan produk untuk memulai</p>
                     </div>
                   ) : (
                     cartItems.map((item) => (
@@ -392,9 +394,9 @@ const Transaction = () => {
                 </div>
 
                 {cartItems.length > 0 && (
-                  <div className="border-t p-4 bg-white">
-                    <div className="bg-blue-50 p-3 rounded-lg mb-4">
-                      <div className="flex justify-between text-xl font-bold text-blue-900">
+                  <div className="border-t p-3 sm:p-4 bg-white">
+                    <div className="bg-blue-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4">
+                      <div className="flex justify-between text-lg sm:text-xl font-bold text-blue-900">
                         <span>Total:</span>
                         <span>Rp {totalAmount.toLocaleString('id-ID')}</span>
                       </div>
@@ -404,7 +406,7 @@ const Transaction = () => {
                         setShowMobileCart(false);
                         handlePayment();
                       }} 
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 text-lg shadow-lg" 
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 sm:py-4 text-sm sm:text-base md:text-lg shadow-lg" 
                       size="lg"
                     >
                       Bayar Sekarang
